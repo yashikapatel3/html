@@ -1,0 +1,2975 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${movie.movieName} + ' - KAISI LAGI'">Movie - KAISI LAGI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            /* Colors matching your background */
+            --primary-pink: #E91E63;
+            --primary-purple: #9C27B0;
+            --primary-blue: #2196F3;
+            --primary-orange: #FF9800;
+            --primary-dark: #1a0a2e;
+            --primary-darker: #0f0519;
+
+            --gradient-primary: linear-gradient(135deg, #E91E63 0%, #9C27B0 50%, #2196F3 100%);
+            --gradient-dark: linear-gradient(135deg, rgba(26, 10, 46, 0.95) 0%, rgba(15, 5, 25, 0.98) 100%);
+            --gradient-card: linear-gradient(135deg, rgba(233, 30, 99, 0.1) 0%, rgba(156, 39, 176, 0.1) 100%);
+
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --shadow-lg: 0 10px 25px rgba(233, 30, 99, 0.3);
+            --shadow-xl: 0 20px 40px rgba(156, 39, 176, 0.4);
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 10px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+             font-family: 'Poppins', sans-serif;
+            background-image: url("/images/bb.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--gradient-dark);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 2px solid rgba(233, 30, 99, 0.3);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 30px rgba(233, 30, 99, 0.2);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            text-shadow: 0 0 30px rgba(233, 30, 99, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #E91E63;
+            transform: translateY(-2px);
+        }
+
+        .nav-links a:hover::after { width: 100%; }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 2rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+        .container h1 {
+            padding: 10px 40px;
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #FFF 0%, #ffffff 50%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(233, 203, 30, 0.3);
+            border-left: 8px solid #f05c95;
+            /* border-bottom: 4px solid #ffa4c7; */
+            border-radius: 0px;
+        }
+
+        /* Hero Section - Adjusted Ratio */
+        .hero-section {
+            display: grid;
+            grid-template-columns: 1fr 2.2fr; /* REDUCED trailer width - was 3fr */
+            gap: 1rem;
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Poster Carousel - 1 Part */
+        .poster-carousel-section {
+            position: relative;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(233, 30, 99, 0.4);
+            background: var(--gradient-dark);
+            border: 2px solid rgba(233, 30, 99, 0.3);
+            animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+        }
+
+        .poster-carousel-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/4;
+            overflow: hidden;
+        }
+
+        .poster-carousel-wrapper {
+            display: flex;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .poster-carousel-img {
+            min-width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+        }
+
+        .poster-carousel-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        /* Carousel Indicators */
+        .poster-carousel-indicators {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .poster-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .poster-indicator:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: scale(1.2);
+        }
+
+        .poster-indicator.active {
+            background: linear-gradient(135deg, #E91E63, #9C27B0);
+            width: 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(233, 30, 99, 0.6);
+        }
+
+        /* Trailer Section - 3 Parts */
+        .trailer-section {
+            background: var(--gradient-dark);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            border: 2px solid rgba(233, 30, 99, 0.3);
+            animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(156, 39, 176, 0.4);
+        }
+
+        .trailer-header {
+            /* background: linear-gradient(135deg, rgba(169, 30, 233, 0.16) 0%, rgba(156, 39, 176, 0.3) 100%); */
+            backdrop-filter: blur(10px);
+            padding: 1.25rem 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            /* border-bottom: 2px solid rgba(233, 30, 99, 0.2); */
+        }
+
+        .trailer-icon {
+            width: 45px;
+            height: 45px;
+           /* background: linear-gradient(135deg, #f478a1, #fce238); */
+           background-color: #b71e56;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(37, 2, 14, 0.6);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 5px 20px rgba(115, 53, 2, 0.6);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 8px 30px rgba(124, 90, 59, 0.8);
+            }
+        }
+
+        .trailer-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: #FFF;
+            margin-left: 3px;
+        }
+
+        .trailer-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+            background-color: #fff;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .trailer-container {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            background: #000;
+        }
+
+        .trailer-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .no-trailer {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .no-trailer svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1.5rem;
+            opacity: 0.4;
+            fill: rgba(233, 30, 99, 0.5);
+            filter: drop-shadow(0 0 20px rgba(233, 30, 99, 0.3));
+        }
+
+        .no-trailer p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        /* Movie Info Section */
+        .movie-info-section {
+            background-color: #0f051918;
+             backdrop-filter: blur(10px);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            /* border: 2px solid rgba(233, 30, 99, 0.3); */
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+            box-shadow: 0 10px 40px rgba(187, 192, 129, 0.3);
+        }
+
+        .movie-header {
+            display: grid;
+            grid-template-columns: 500px 1fr; /* INCREASED FROM 250px to 500px for wider rectangle carousel */
+            gap: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Movie Poster Carousel in Movie Info */
+        .single-poster {
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(233, 30, 99, 0.5);
+            aspect-ratio: 16/9; /* CHANGED from 2/3 to 16/9 for wide rectangle */
+            border: 2px solid rgba(233, 30, 99, 0.3);
+        }
+
+        /* Carousel Wrapper for Multiple Images */
+        .single-poster-carousel {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .single-poster-slide {
+            min-width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+        }
+
+        .single-poster-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Carousel Navigation for Single Poster */
+        .single-poster-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(233, 30, 99, 0.9);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #FFF;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+            opacity: 0;
+        }
+
+        .single-poster:hover .single-poster-btn { opacity: 1; }
+
+        .single-poster-btn:hover {
+            background: rgba(156, 39, 176, 0.9);
+            border-color: #FFF;
+            transform: translateY(-50%) scale(1.15);
+            box-shadow: 0 5px 20px rgba(233, 30, 99, 0.6);
+        }
+
+        .single-poster-btn.prev { left: 10px; }
+        .single-poster-btn.next { right: 10px; }
+
+        /* Carousel Indicators for Single Poster */
+        .single-poster-indicators {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .single-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .single-indicator:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: scale(1.2);
+        }
+
+        .single-indicator.active {
+            background: linear-gradient(135deg, #E91E63, #9C27B0);
+            width: 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(233, 30, 99, 0.6);
+        }
+
+        .single-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Movie Details */
+        .movie-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .movie-title {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #FFF 0%, #ffffff 50%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(233, 203, 30, 0.3);
+        }
+
+        .meta-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.05rem;
+            overflow:hidden;
+        }
+
+        .meta-separator {
+            width: 5px;
+            height: 5px;
+            background: linear-gradient(135deg, #E91E63, #9C27B0);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(233, 30, 99, 0.5);
+        }
+
+        /* Rating Card */
+        .rating-section {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .rating-card {
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.2) 0%, rgba(156, 39, 176, 0.2) 100%);
+            border: 2px solid rgba(233, 199, 30, 0.4);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(233, 30, 99, 0.3);
+        }
+
+        .rating-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(233, 30, 99, 0.5);
+            border-color: #E91E63;
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.3) 0%, rgba(156, 39, 176, 0.3) 100%);
+        }
+
+        .rating-icon {
+            font-size: 2.5rem;
+            filter: drop-shadow(0 2px 10px rgba(255, 215, 0, 0.6));
+        }
+
+        .rating-content h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.25rem;
+        }
+
+        .rating-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFD700, #E91E63);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .rating-value span {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Action Button */
+        .action-button {
+            background: linear-gradient(135deg, #E91E63 0%, #9C27B0 100%);
+            border: none;
+            padding: 1rem 2.5rem;
+           width:50%;
+            border-radius: 60px;
+            color: #FFF;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(49, 12, 25, 0.645);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .action-button:hover::before {
+            left: 100%;
+        }
+
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(233, 30, 99, 0.6);
+        }
+
+        /* Overview */
+        .overview-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .overview-text {
+            color: rgb(255, 255, 255);
+            line-height: 1.8;
+        }
+
+        /* Details Grid */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+             backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.1) 0%, rgba(156, 39, 176, 0.1) 100%);
+            border: 1px solid rgba(250, 244, 131, 0.723);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover {
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.2) 0%, rgba(156, 39, 176, 0.2) 100%);
+            border-color: rgba(233, 30, 99, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
+        }
+
+        .detail-item label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ffdc5c;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .detail-item value {
+            display: block;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 500;
+            font-size: 1.05rem;
+        }
+
+        /* Cast Section */
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 3rem 0 1.5rem;
+            padding-left: 1rem;
+            position: relative;
+            color: #FFF;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #E91E63, #9C27B0);
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(233, 30, 99, 0.5);
+        }
+
+        .cast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .cast-card {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .cast-card:hover { transform: translateY(-8px); }
+
+        .cast-card a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .cast-photo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            overflow: hidden;
+            background: linear-gradient(135deg, #E91E63, #9C27B0);
+            box-shadow: 0 8px 25px rgba(233, 30, 99, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            border: 3px solid rgba(250, 209, 22, 0.909);
+        }
+
+        .cast-card:hover .cast-photo {
+            box-shadow: 0 12px 35px rgba(233, 30, 99, 0.7);
+            transform: scale(1.05);
+            border-color: rgba(247, 189, 27, 0.924);
+        }
+
+        .cast-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cast-photo .initials {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #FFF;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .cast-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            transition: color 0.3s ease;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .cast-card:hover .cast-name { color: #fff0f5; }
+
+        .cast-role {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Comments */
+        .comment-section-wrapper {
+     margin: 3rem 0;
+                 background-color: #0f051918;
+             backdrop-filter: blur(10px);
+     padding: 2rem;
+     border-radius: 20px;
+ }
+
+ .section-title-wrapper {
+     display: flex;
+     align-items: center;
+     gap: 1rem;
+     margin-bottom: 2rem;
+ }
+
+ .comment-count-badge {
+     background: linear-gradient(135deg, #e80266 0%, #760313 100%);
+     color: #fff;
+     padding: 0.3rem 0.9rem;
+     border-radius: 20px;
+     font-size: 0.85rem;
+     font-weight: 600;
+     box-shadow: 0 2px 8px rgba(232, 2, 102, 0.25);
+ }
+
+ .add-comment-box {
+     display: flex;
+     gap: 1rem;
+     margin-bottom: 2.5rem;
+     padding: 1rem;
+     background: #fff2c595;
+     border-radius: 12px;
+     transition: all 0.3s ease;
+ }
+
+ .add-comment-box:focus-within {
+     background: rgba(255, 255, 255, 0.953);
+ }
+
+ .comment-avatar {
+     width: 40px;
+     height: 40px;
+     border-radius: 50%;
+     flex-shrink: 0;
+     background: linear-gradient(135deg, #e80266 0%, #760313 100%);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     color: #fff;
+     font-weight: 700;
+     font-size: 0.9rem;
+     box-shadow: 0 2px 8px rgba(232, 2, 102, 0.2);
+ }
+
+ .comment-input-wrapper {
+     flex: 1;
+     display: flex;
+     flex-direction: column;
+     gap: 0.7rem;
+ }
+
+ .comment-input {
+    color: #000000;
+     width: 100%;
+     min-height: 40px;
+     max-height: 150px;
+     padding: 0.6rem 0.8rem;
+     border: none;
+     border-bottom: 1px solid #fd74c6;
+     border-radius: 0;
+     font-size: 0.9rem;
+     font-family: 'Poppins', sans-serif;
+     resize: none;
+     transition: all 0.3s ease;
+     background: transparent;
+     overflow-y: auto;
+ }
+
+ .comment-input:focus {
+     outline: none;
+     border-bottom: 2px solid #cb0350;
+     padding-bottom: 0.5rem;
+ }
+
+ .comment-input::placeholder {
+     color: #999;
+     font-size: 0.9rem;
+ }
+
+ .comment-actions {
+     display: flex;
+     justify-content: flex-end;
+     gap: 0.7rem;
+ }
+
+ .comment-btn {
+     padding: 0.5rem 1.2rem;
+     border-radius: 18px;
+     font-weight: 600;
+     cursor: pointer;
+     transition: all 0.2s ease;
+     font-size: 0.85rem;
+     border: none;
+ }
+
+ .cancel-btn {
+     background: transparent;
+     color: #000000;
+ }
+
+ .cancel-btn:hover {
+     background: #f2f2f2;
+ }
+
+ .submit-comment-btn {
+     background: linear-gradient(135deg, #e80266 0%, #760313 100%);
+     color: #fff;
+ }
+
+ .submit-comment-btn:hover:not(:disabled) {
+     transform: translateY(-1px);
+     box-shadow: 0 3px 10px rgba(232, 2, 102, 0.3);
+ }
+
+ .submit-comment-btn:disabled {
+     opacity: 0.4;
+     cursor: not-allowed;
+ }
+
+ .comments-list {
+     display: flex;
+     flex-direction: column;
+     gap: 1.5rem;
+ }
+
+ .comment-item {
+     display: flex;
+     gap: 1rem;
+     padding: 0.8rem 0;
+     transition: all 0.2s ease;
+     position: relative;
+ }
+
+ .comment-content-wrapper {
+     flex: 1;
+     display: flex;
+     flex-direction: column;
+     gap: 0.4rem;
+ }
+
+ .comment-header {
+     display: flex;
+     align-items: center;
+     gap: 0.6rem;
+     flex-wrap: wrap;
+ }
+
+ .comment-author {
+     font-weight: 600;
+     color: #ffffff;
+     font-size: 1rem;
+     font-family: 'Poppins', sans-serif;
+ }
+
+ .comment-date {
+     color: #d6d6d6;
+     font-size: 0.75rem;
+     font-family: 'Poppins', sans-serif;
+ }
+
+ .comment-text {
+     color: #ffffff;
+     line-height: 1.5;
+     font-size: 0.9rem;
+     word-wrap: break-word;
+     white-space: pre-wrap;
+     font-family: 'Poppins', sans-serif;
+ }
+
+ .comment-footer {
+     display: flex;
+     align-items: center;
+     gap: 1rem;
+     margin-top: 0.3rem;
+ }
+
+ .comment-like-btn {
+     display: flex;
+     align-items: center;
+     gap: 0.4rem;
+     background: transparent;
+     border: none;
+     cursor: pointer;
+     padding: 0.4rem 0.6rem;
+     border-radius: 18px;
+     transition: all 0.2s ease;
+     color: #ffffff;
+     font-size: 0.8rem;
+     font-weight: 500;
+ }
+
+ .comment-like-btn:hover {
+     background: #f2f2f2;
+ }
+
+ .comment-like-btn.liked {
+     color: #cb0350;
+ }
+
+ .comment-like-btn svg {
+     width: 16px;
+     height: 16px;
+     fill: currentColor;
+ }
+
+ .comment-reply-btn {
+     background: transparent;
+     border: none;
+     color: #ffffff;
+     cursor: pointer;
+     padding: 0.4rem 0.6rem;
+     border-radius: 18px;
+     transition: all 0.2s ease;
+     font-weight: 600;
+     font-size: 0.8rem;
+ }
+
+ .comment-reply-btn:hover {
+     background: #f2f2f2;
+     color: #cb0350;
+ }
+
+ .comment-menu-btn {
+     background: transparent;
+     border: none;
+     cursor: pointer;
+     padding: 0.3rem;
+     border-radius: 50%;
+     transition: all 0.2s ease;
+     color: #ffffff;
+     margin-left: auto;
+     width: 30px;
+     height: 30px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+ }
+
+ .comment-menu-btn:hover {
+     background: #232323;
+ }
+
+ .comment-menu-btn svg {
+     width: 18px;
+     height: 18px;
+     fill: currentColor;
+ }
+
+ .comment-menu {
+     position: absolute;
+     right: 0;
+     top: 2.5rem;
+     background: #fff;
+     border: 1px solid #e0e0e0;
+     border-radius: 8px;
+     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+     padding: 0.3rem 0;
+     min-width: 140px;
+     z-index: 10;
+     display: none;
+ }
+
+ .comment-menu.active {
+     display: block;
+ }
+
+ .menu-item {
+     padding: 0.6rem 0.9rem;
+     cursor: pointer;
+     transition: all 0.2s;
+     display: flex;
+     align-items: center;
+     gap: 0.7rem;
+     color: #1f1f1f;
+     font-size: 0.85rem;
+ }
+
+ .menu-item:hover {
+     background: #f2f2f2;
+ }
+
+ .menu-item svg {
+     width: 16px;
+     height: 16px;
+     fill: currentColor;
+ }
+
+ .menu-item.delete {
+     color: #dc3545;
+ }
+
+ .reply-box {
+     display: none;
+     margin-top: 0.8rem;
+     margin-left: 0;
+     padding-left: 0;
+ }
+
+ .reply-box.active {
+     display: flex;
+     gap: 0.8rem;
+ }
+
+ .reply-box .comment-avatar {
+     width: 32px;
+     height: 32px;
+     font-size: 0.75rem;
+ }
+
+ .reply-box .comment-input {
+     min-height: 36px;
+     font-size: 0.85rem;
+ }
+
+ .replies-list {
+     margin-top: 1.2rem;
+     margin-left: 48px;
+     padding-left: 16px;
+     border-left: 2px solid #e8e8e8;
+     display: flex;
+     flex-direction: column;
+     gap: 1.2rem;
+ }
+
+ .nested-replies-container {
+     margin-top: 1rem;
+     margin-left: 48px;
+     padding-left: 16px;
+     border-left: 2px solid #e8e8e8;
+     display: flex;
+     flex-direction: column;
+     gap: 1rem;
+ }
+
+ .view-replies-btn {
+     background: transparent;
+     border: none;
+     color: #c7cce0;
+     cursor: pointer;
+     padding: 0.4rem 0;
+     font-weight: 600;
+     font-size: 0.8rem;
+     display: flex;
+     align-items: center;
+     gap: 0.4rem;
+     transition: all 0.2s;
+     margin-top: 0.3rem;
+     margin-left: 48px;
+ }
+
+ .view-replies-btn:hover {
+     color: #b2bdfb;
+ }
+
+ .view-replies-btn svg {
+     width: 14px;
+     height: 14px;
+     fill: currentColor;
+     transition: transform 0.2s;
+ }
+
+ .view-replies-btn.expanded svg {
+     transform: rotate(180deg);
+ }
+
+ .no-comments {
+     text-align: center;
+     padding: 3rem 1.5rem;
+     color: #efeeee;
+ }
+
+ .no-comments svg {
+     width: 70px;
+     height: 70px;
+     margin-bottom: 1rem;
+     opacity: 0.3;
+     fill: #999;
+ }
+
+ .no-comments h3 {
+     color: #ffffff;
+     margin-bottom: 0.4rem;
+     font-size: 1.1rem;
+ }
+
+ .no-comments p {
+     font-size: 0.9rem;
+     color: #eceaea;
+ }
+
+ .comment-input::-webkit-scrollbar {
+     width: 4px;
+ }
+
+ .comment-input::-webkit-scrollbar-track {
+     background: transparent;
+ }
+
+ .comment-input::-webkit-scrollbar-thumb {
+     background: #ccc;
+     border-radius: 4px;
+ }
+
+ .comment-input::-webkit-scrollbar-thumb:hover {
+     background: #999;
+ }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+            z-index: 2000; /* Modal overlay z-index */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        /* SweetAlert Override - Make sure it appears ABOVE modal */
+        .swal2-container {
+            z-index: 3000 !important; /* ABOVE modal overlay (2000) */
+        }
+
+        .review-modal {
+            background: var(--gradient-dark);
+            border: 2px solid rgba(233, 30, 99, 0.5);
+            border-radius: var(--radius-xl);
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(233, 30, 99, 0.4);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 2rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(233, 30, 99, 0.2);
+            color: #E91E63;
+            transform: rotate(90deg);
+        }
+
+        .modal-header { text-align: center; margin-bottom: 2.5rem; }
+
+        .rate-label {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+        }
+
+        .movie-title-modal {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            color: #FFF;
+        }
+
+        .big-star {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 2rem;
+            position: relative;
+        }
+
+        .big-star svg {
+            width: 100%;
+            height: 100%;
+            fill: url(#starGradient);
+            filter: drop-shadow(0 8px 30px rgba(233, 30, 99, 0.6));
+        }
+
+        .big-star-number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #FFF;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .star-rating-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .star-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .star-btn:hover { transform: scale(1.15); }
+
+        .star-btn svg {
+            width: 50px;
+            height: 50px;
+            fill: rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .star-btn.filled svg {
+            fill: url(#starGradient);
+            filter: drop-shadow(0 2px 8px rgba(233, 30, 99, 0.5));
+        }
+
+        .rating-description {
+            text-align: center;
+            color: #E91E63;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            min-height: 30px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #E91E63, #9C27B0);
+            color: #FFF;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: var(--radius-lg);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(233, 30, 99, 0.4);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(233, 30, 99, 0.6);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-section {
+                grid-template-columns: 1fr;
+            }
+
+            .movie-header {
+                grid-template-columns: 200px 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body { padding-top: 60px; }
+            .container { padding: 1rem 1rem 3rem; }
+            .container h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background-color: #f9f2c9;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 241, 245, 0.3);
+        }
+            .movie-header { grid-template-columns: 1fr; }
+            .single-poster { max-width: 300px; margin: 0 auto; }
+            .movie-title { font-size: 2rem; }
+            .cast-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+        }
+
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: rgba(26, 10, 46, 0.5); }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #E91E63, #9C27B0);
+            border-radius: 6px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #9C27B0, #E91E63);
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: nav(activePage='home')}"></div>
+<div class="container">
+    <h1 th:text="${movie.movieName}"></h1>
+    <!-- HERO SECTION: Poster Carousel (1 part) + Trailer (3 parts) -->
+    <div class="hero-section">
+        <!-- Poster Carousel -->
+        <div class="poster-carousel-section">
+            <div class="poster-carousel-container">
+                <div class="poster-carousel-wrapper" id="posterCarouselWrapper">
+                    <div class="poster-carousel-img">
+                        <img th:src="${'/image/' + image[0].imageId}" alt="Movie Poster">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trailer Section -->
+        <div class="trailer-section">
+            <div class="trailer-header">
+                <div class="trailer-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                </div>
+                <h2 class="trailer-title">Official Trailer</h2>
+            </div>
+
+            <div th:if="${trailerUrl != null && trailerUrl != ''}" class="trailer-container">
+                    <iframe th:src="${#strings.replace(trailerUrl,'watch?v=','embed/')}"
+                            allowfullscreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+                    </iframe>
+            </div>
+
+            <div th:if="${trailerUrl == null || trailerUrl == ''}" class="no-trailer">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                <p>Trailer not available at this time</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOVIE INFO SECTION -->
+    <div class="movie-info-section">
+        <div class="movie-header">
+            <!-- Single Poster Carousel with All Images -->
+            <div class="single-poster" th:if="${image != null && !image.isEmpty()}">
+                <div class="single-poster-carousel" id="singlePosterCarousel">
+                    <div class="single-poster-slide" th:each="i : ${image}">
+                        <img th:src="${'/image/'+i.imageId}" alt="Movie Scene">
+                    </div>
+                </div>
+                <button class="single-poster-btn prev" onclick="changeSinglePosterSlide(-1)">❮</button>
+                <button class="single-poster-btn next" onclick="changeSinglePosterSlide(1)">❯</button>
+                <div class="single-poster-indicators" id="singlePosterIndicators"></div>
+            </div>
+
+            <!-- Movie Details -->
+            <div class="movie-details">
+                <div>
+                    <h2 class="movie-title" th:text="${movie.movieName}">Movie Title</h2>
+                    <div class="meta-info">
+                        <span th:text="${releasedDate}">2024</span>
+                        <span class="meta-separator"></span>
+                        <span th:text="${movie.duration} + ' min'">120 min</span>
+                        <span class="meta-separator">|</span>
+                        <span th:text="${movie.genre}">Action </span>
+                    </div>
+                </div>
+
+                <div class="rating-section">
+                    <div class="rating-card">
+                        <div class="rating-icon">⭐</div>
+                        <div class="rating-content">
+                            <h3>KAISI LAGI RATING</h3>
+                            <div class="rating-value">
+                                <span th:text="${avgRate}">0.0</span>
+                                <span>/5</span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 0.25rem;"
+                                 th:text="${rateCount} + ' reviews'">0 reviews</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="action-button" onclick="openReviewModal()">⭐ Rate This Movie</button>
+            </div>
+        </div>
+
+        <div class="overview-section">
+            <h3>Overview</h3>
+            <p class="overview-text" th:text="${movie.description}">Movie description...</p>
+        </div>
+
+        <div class="details-grid">
+            <div class="detail-item">
+                <label>Release Date</label>
+                <value th:text="${releasedDate}">2024</value>
+            </div>
+            <div class="detail-item">
+                <label>Duration</label>
+                <value th:text="${movie.duration} + ' min'">120 min</value>
+            </div>
+            <div class="detail-item">
+                <label>Language</label>
+                <value th:text="${movie.language}">English</value>
+            </div>
+            <div class="detail-item">
+                <label>Genre</label>
+                <value th:text="${movie.genre}">Action</value>
+            </div>
+        </div>
+    </div>
+
+    <!-- CAST SECTION -->
+    <h2 class="section-title">Cast & Crew</h2>
+    <div class="cast-grid">
+        <div class="cast-card" th:each="c : ${director}">
+            <a th:href="@{/people/{pid}(pid=${c.pid})}">
+                <div class="cast-photo">
+                    <img th:if="${c.image != null}" th:src="@{'/profile/' + ${c.pid}}" th:alt="${c.peopleName}" onerror="this.style.display='none';">
+                    <span class="initials" th:if="${c.image == null}" th:text="${#strings.substring(c.peopleName, 0, 2).toUpperCase()}">??</span>
+                </div>
+                <div class="cast-name" th:text="${c.peopleName}">Name</div>
+                <div class="cast-role">Director</div>
+            </a>
+        </div>
+
+        <div class="cast-card" th:each="c : ${actor}">
+            <a th:href="@{/people/{pid}(pid=${c.pid})}">
+                <div class="cast-photo">
+                    <img th:if="${c.image != null}" th:src="@{'/profile/' + ${c.pid}}" th:alt="${c.peopleName}" onerror="this.style.display='none';">
+                    <span class="initials" th:if="${c.image == null}" th:text="${#strings.substring(c.peopleName, 0, 2).toUpperCase()}">??</span>
+                </div>
+                <div class="cast-name" th:text="${c.peopleName}">Name</div>
+                <div class="cast-role">Actor</div>
+            </a>
+        </div>
+
+        <div class="cast-card" th:each="c : ${singer}">
+            <a th:href="@{/people/{pid}(pid=${c.pid})}">
+                <div class="cast-photo">
+                    <img th:if="${c.image != null}" th:src="@{'/profile/' + ${c.pid}}" th:alt="${c.peopleName}" onerror="this.style.display='none';">
+                    <span class="initials" th:if="${c.image == null}" th:text="${#strings.substring(c.peopleName, 0, 2).toUpperCase()}">??</span>
+                </div>
+                <div class="cast-name" th:text="${c.peopleName}">Name</div>
+                <div class="cast-role">Singer</div>
+            </a>
+        </div>
+
+        <div class="cast-card" th:each="c : ${ppl}">
+            <a th:href="@{/people/{pid}(pid=${c.pid})}">
+                <div class="cast-photo">
+                    <img th:if="${c.image != null}" th:src="@{'/profile/' + ${c.pid}}" th:alt="${c.peopleName}" onerror="this.style.display='none';">
+                    <span class="initials" th:if="${c.image == null}" th:text="${#strings.substring(c.peopleName, 0, 2).toUpperCase()}">??</span>
+                </div>
+                <div class="cast-name" th:text="${c.peopleName}">Name</div>
+                <div class="cast-role" th:text="${c.role}">Role</div>
+            </a>
+        </div>
+    </div>
+
+    <a th:href="@{/CastRating/{id}(id=${movie.movieId})}">
+        <button class="action-button">⭐ Rate Cast & Crew</button>
+    </a>
+
+    <!-- COMMENTS SECTION -->
+    <div class="comment-section-wrapper">
+        <div class="section-title-wrapper">
+            <h2 class="section-title">Comments</h2>
+            <span class="comment-count-badge" th:text="${comment.size()} + ' Comments'">12 Comments</span>
+        </div>
+
+
+        <!-- Add New Comment Box with Form -->
+        <div class="add-comment-box">
+            <div class="comment-avatar"
+                 th:text="${session.loggedUser != null ? #strings.substring(session.loggedUser.username, 0, 2).toUpperCase() : '??'}">
+                US
+            </div>
+            <div class="comment-input-wrapper">
+                <form id="addCommentForm" th:action="@{/addComment}" method="POST" onsubmit="return validateComment(event)">
+                    <!-- Hidden field for movie ID -->
+                    <input type="hidden" name="movieId" th:value="${movie.movieId}"/>
+
+                    <!-- Comment textarea -->
+                    <textarea
+                            class="comment-input"
+                            id="newCommentInput"
+                            name="comment"
+                            placeholder="Add a comment..."
+                            rows="2"
+                            maxlength="1000"></textarea>
+
+                    <!-- Action buttons -->
+                    <div class="comment-actions" style="display: none;" id="commentActions">
+                        <button type="button" class="comment-btn cancel-btn" onclick="cancelComment()">Cancel</button>
+                        <button type="submit" class="comment-btn submit-comment-btn" disabled id="submitCommentBtn">
+                            Comment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="no-comments" th:if="${comment.isEmpty()}">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+            </svg>
+            <h3>No comments yet</h3>
+            <p>Be the first to share your thoughts!</p>
+        </div>
+        <!-- <p th:text="${session.loggedUser}+'User'">User</p> -->
+        <!-- Comments List -->
+        <div class="comments-list" th:if="${!comment.isEmpty()}">
+            <div class="comment-item" th:each="c : ${comment}">
+                <!-- Comment Avatar -->
+                <div class="comment-avatar"
+                     th:text="${#strings.substring(c.user.username, 0, 2).toUpperCase()}">
+                    UN
+                </div>
+
+                <!-- Comment Content -->
+                <div class="comment-content-wrapper">
+                    <div class="comment-header">
+                        <span class="comment-author" th:text="${c.user.username}">Username</span>
+                        <span class="comment-date" th:text="${c.reviewDate}">2 days ago</span>
+                    </div>
+
+                    <div class="comment-text" th:text="${c.comment}">
+                        This is a sample comment text...
+                    </div>
+
+                    <div class="comment-footer">
+                        <button class="comment-like-btn" th:onclick="'toggleLike(' + ${c.reviewId} + ')'">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/>
+                            </svg>
+                            <span th:text="${c.likeCount}">10</span>
+                        </button>
+
+                        <button class="comment-reply-btn" th:onclick="'toggleReplyBox(' + ${c.reviewId} + ')'">
+                            Reply
+                        </button>
+
+                        <!-- Three Dots Menu -->
+                        <button class="comment-menu-btn" th:onclick="'toggleMenu(' + ${c.reviewId} + ')'">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Menu - UPDATED -->
+                        <div class="comment-menu" th:id="'menu-' + ${c.reviewId}">
+                            <!-- Show DELETE only for own comments -->
+                            <div class="menu-item delete"
+                                 th:if="${session.loggedUser != null && session.loggedUser.id == c.user.id}"
+                                 th:onclick="'deleteComment(' + ${c.reviewId} + ')'">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                                Delete
+                            </div>
+
+                            <!-- Show REPORT for all comments except own -->
+                            <div class="menu-item"
+                                 th:if="${session.loggedUser == null || session.loggedUser.id != c.user.id}"
+                                 th:onclick="'reportComment(' + ${c.reviewId} + ')'">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
+                                </svg>
+                                Report
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reply Box -->
+                    <div class="reply-box" th:id="'reply-box-' + ${c.reviewId}">
+                        <div class="comment-avatar"
+                             th:text="${session.loggedUser != null ? #strings.substring(session.loggedUser.username, 0, 2).toUpperCase() : '??'}">
+                            US
+                        </div>
+                        <div class="comment-input-wrapper">
+                            <form th:id="'reply-form-' + ${c.reviewId}"
+                                  th:action="@{/addReply}"
+                                  method="POST"
+                                  th:onsubmit="'return validateReply(event, ' + ${c.reviewId} + ')'">
+
+                                <input type="hidden" name="reviewId" th:value="${c.reviewId}"/>
+                                <input type="hidden" name="movieId" th:value="${movie.movieId}"/>
+
+                                <textarea
+                                        class="comment-input"
+                                        th:id="'reply-input-' + ${c.reviewId}"
+                                        name="replyText"
+                                        placeholder="Add a reply..."
+                                        rows="2"
+                                        maxlength="1000"
+                                        th:oninput="'enableReplyButton(' + ${c.reviewId} + ')'"></textarea>
+
+                                <div class="comment-actions">
+                                    <button type="button" class="comment-btn cancel-btn"
+                                            th:onclick="'cancelReply(' + ${c.reviewId} + ')'">Cancel</button>
+                                    <button type="submit" class="comment-btn submit-comment-btn"
+                                            th:id="'reply-submit-' + ${c.reviewId}" disabled>Reply</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- View Replies Button (if replies exist) -->
+                    <button class="view-replies-btn"
+                            th:if="${c.replyCount > 0}"
+                            th:onclick="'toggleReplies(' + ${c.reviewId} + ')'"
+                            th:id="'view-replies-' + ${c.reviewId}">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                        <span th:text="${c.replyCount} + ' ' + (${c.replyCount} == 1 ? 'reply' : 'replies')">3 replies</span>
+                    </button>
+
+
+                    <!-- Replies List Container -->
+
+                    <!-- Replies List Container -->
+                    <div class="replies-list" th:id="'replies-' + ${c.reviewId}" style="display: none;">
+                        <!-- First Level Replies -->
+                        <div class="comment-item" th:each="reply : ${c.replies}">
+                            <div class="comment-avatar"
+                                 th:text="${#strings.substring(reply.user.username, 0, 2).toUpperCase()}">
+                                UN
+                            </div>
+
+                            <div class="comment-content-wrapper">
+                                <div class="comment-header">
+                                    <span class="comment-author" th:text="${reply.user.username}">Username</span>
+                                    <span class="comment-date" th:text="${reply.replyDate}">1 day ago</span>
+                                </div>
+
+                                <div class="comment-text" th:text="${reply.replyText}">
+                                    This is a reply text...
+                                </div>
+
+                                <div class="comment-footer">
+                                    <!-- Like button for reply -->
+                                    <button class="comment-like-btn" th:onclick="'toggleReplyLike(' + ${reply.replyId} + ')'">
+                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/>
+                                        </svg>
+                                        <span th:text="${reply.likeCount != null ? reply.likeCount : 0}">5</span>
+                                    </button>
+
+                                    <!-- Reply to reply button -->
+                                    <button class="comment-reply-btn" th:onclick="'toggleNestedReplyBox(' + ${reply.replyId} + ', ' + ${c.reviewId} + ')'">
+                                        Reply
+                                    </button>
+
+                                    <!-- Three Dots Menu for Reply -->
+                                    <button class="comment-menu-btn" th:onclick="'toggleMenu(' + ${reply.replyId} + ')'">
+                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                                        </svg>
+                                    </button>
+
+                                    <!-- Dropdown Menu for Reply -->
+                                    <div class="comment-menu" th:id="'menu-' + ${reply.replyId}">
+                                        <!-- Show DELETE only for own replies -->
+                                        <div class="menu-item delete"
+                                             th:if="${session.loggedUser != null && session.loggedUser.id == reply.user.id}"
+                                             th:onclick="'deleteReply(' + ${reply.replyId} + ')'">
+                                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                            </svg>
+                                            Delete
+                                        </div>
+
+                                        <!-- Show REPORT for all replies except own -->
+                                        <div class="menu-item"
+                                             th:if="${session.loggedUser == null || session.loggedUser.id != reply.user.id}"
+                                             th:onclick="'reportReply(' + ${reply.replyId} + ')'">
+                                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
+                                            </svg>
+                                            Report
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Nested Reply Box (for replying to this reply) -->
+                                <div class="reply-box" th:id="'nested-reply-box-' + ${reply.replyId}">
+                                    <div class="comment-avatar"
+                                         th:text="${session.loggedUser != null ? #strings.substring(session.loggedUser.username, 0, 2).toUpperCase() : '??'}">
+                                        US
+                                    </div>
+                                    <div class="comment-input-wrapper">
+                                        <form th:id="'nested-reply-form-' + ${reply.replyId}"
+                                              th:action="@{/addNestedReply}"
+                                              method="POST"
+                                              th:onsubmit="'return validateNestedReply(event, ' + ${reply.replyId} + ')'">
+
+                                            <input type="hidden" name="parentReplyId" th:value="${reply.replyId}"/>
+                                            <input type="hidden" name="reviewId" th:value="${c.reviewId}"/>
+                                            <input type="hidden" name="movieId" th:value="${movie.movieId}"/>
+
+                                            <textarea
+                                                    class="comment-input"
+                                                    th:id="'nested-reply-input-' + ${reply.replyId}"
+                                                    name="replyText"
+                                                    th:placeholder="'Reply to ' + ${reply.user.username} + '...'"
+                                                    rows="2"
+                                                    maxlength="1000"
+                                                    th:oninput="'enableNestedReplyButton(' + ${reply.replyId} + ')'"></textarea>
+
+                                            <div class="comment-actions">
+                                                <button type="button" class="comment-btn cancel-btn"
+                                                        th:onclick="'cancelNestedReply(' + ${reply.replyId} + ')'">Cancel</button>
+                                                <button type="submit" class="comment-btn submit-comment-btn"
+                                                        th:id="'nested-reply-submit-' + ${reply.replyId}" disabled>Reply</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- View Nested Replies Button (SAFE VERSION - checks if nestedReplies list exists and is not empty) -->
+                                <button class="view-replies-btn"
+                                        th:if="${reply.nestedReplies != null && !reply.nestedReplies.isEmpty()}"
+                                        th:onclick="'toggleNestedReplies(' + ${reply.replyId} + ')'"
+                                        th:id="'view-nested-replies-' + ${reply.replyId}"
+                                        style="margin-left: 0;">
+                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M7 10l5 5 5-5z"/>
+                                    </svg>
+                                    <span th:text="${reply.nestedReplies.size()} + ' ' + (${reply.nestedReplies.size()} == 1 ? 'reply' : 'replies')">2 replies</span>
+                                </button>
+
+                                <!-- RECURSIVE NESTED REPLIES Container -->
+                                <div class="nested-replies-container"
+                                     th:id="'nested-replies-' + ${reply.replyId}"
+                                     style="display: none;"
+                                     th:if="${reply.nestedReplies != null && !reply.nestedReplies.isEmpty()}">
+
+                                    <!-- Second Level (and beyond) Nested Replies -->
+                                    <div class="comment-item" th:each="nestedReply : ${reply.nestedReplies}">
+                                        <div class="comment-avatar"
+                                             th:text="${#strings.substring(nestedReply.user.username, 0, 2).toUpperCase()}">
+                                            UN
+                                        </div>
+
+                                        <div class="comment-content-wrapper">
+                                            <div class="comment-header">
+                                                <span class="comment-author" th:text="${nestedReply.user.username}">Username</span>
+                                                <span class="comment-date" th:text="${nestedReply.replyDate}">30 min ago</span>
+                                            </div>
+
+                                            <div class="comment-text" th:text="${nestedReply.replyText}">
+                                                This is a nested reply...
+                                            </div>
+
+                                            <div class="comment-footer">
+                                                <!-- Like button -->
+                                                <button class="comment-like-btn" th:onclick="'toggleReplyLike(' + ${nestedReply.replyId} + ')'">
+                                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/>
+                                                    </svg>
+                                                    <span th:text="${nestedReply.likeCount != null ? nestedReply.likeCount : 0}">3</span>
+                                                </button>
+
+                                                <!-- Reply button -->
+                                                <button class="comment-reply-btn" th:onclick="'toggleNestedReplyBox(' + ${nestedReply.replyId} + ', ' + ${c.reviewId} + ')'">
+                                                    Reply
+                                                </button>
+
+                                                <!-- Three Dots Menu -->
+                                                <button class="comment-menu-btn" th:onclick="'toggleMenu(' + ${nestedReply.replyId} + ')'">
+                                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                                                    </svg>
+                                                </button>
+
+                                                <!-- Dropdown Menu -->
+                                                <div class="comment-menu" th:id="'menu-' + ${nestedReply.replyId}">
+                                                    <div class="menu-item delete"
+                                                         th:if="${session.loggedUser != null && session.loggedUser.id == nestedReply.user.id}"
+                                                         th:onclick="'deleteReply(' + ${nestedReply.replyId} + ')'">
+                                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                                        </svg>
+                                                        Delete
+                                                    </div>
+
+                                                    <div class="menu-item"
+                                                         th:if="${session.loggedUser == null || session.loggedUser.id != nestedReply.user.id}"
+                                                         th:onclick="'reportReply(' + ${nestedReply.replyId} + ')'">
+                                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
+                                                        </svg>
+                                                        Report
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Reply Box for this nested reply -->
+                                            <div class="reply-box" th:id="'nested-reply-box-' + ${nestedReply.replyId}">
+                                                <div class="comment-avatar"
+                                                     th:text="${session.loggedUser != null ? #strings.substring(session.loggedUser.username, 0, 2).toUpperCase() : '??'}">
+                                                    US
+                                                </div>
+                                                <div class="comment-input-wrapper">
+                                                    <form th:id="'nested-reply-form-' + ${nestedReply.replyId}"
+                                                          th:action="@{/addNestedReply}"
+                                                          method="POST"
+                                                          th:onsubmit="'return validateNestedReply(event, ' + ${nestedReply.replyId} + ')'">
+
+                                                        <input type="hidden" name="parentReplyId" th:value="${nestedReply.replyId}"/>
+                                                        <input type="hidden" name="reviewId" th:value="${c.reviewId}"/>
+                                                        <input type="hidden" name="movieId" th:value="${movie.movieId}"/>
+
+                                                        <textarea
+                                                                class="comment-input"
+                                                                th:id="'nested-reply-input-' + ${nestedReply.replyId}"
+                                                                name="replyText"
+                                                                th:placeholder="'Reply to ' + ${nestedReply.user.username} + '...'"
+                                                                rows="2"
+                                                                maxlength="1000"
+                                                                th:oninput="'enableNestedReplyButton(' + ${nestedReply.replyId} + ')'"></textarea>
+
+                                                        <div class="comment-actions">
+                                                            <button type="button" class="comment-btn cancel-btn"
+                                                                    th:onclick="'cancelNestedReply(' + ${nestedReply.replyId} + ')'">Cancel</button>
+                                                            <button type="submit" class="comment-btn submit-comment-btn"
+                                                                    th:id="'nested-reply-submit-' + ${nestedReply.replyId}" disabled>Reply</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+
+                                            <!-- RECURSIVE: Show button if THIS nested reply has its own nested replies -->
+                                            <button class="view-replies-btn"
+                                                    th:if="${nestedReply.nestedReplies != null && !nestedReply.nestedReplies.isEmpty()}"
+                                                    th:onclick="'toggleNestedReplies(' + ${nestedReply.replyId} + ')'"
+                                                    th:id="'view-nested-replies-' + ${nestedReply.replyId}"
+                                                    style="margin-left: 0;">
+                                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M7 10l5 5 5-5z"/>
+                                                </svg>
+                                                <span th:text="${nestedReply.nestedReplies.size()} + ' more ' + (${nestedReply.nestedReplies.size()} == 1 ? 'reply' : 'replies')">1 reply</span>
+                                            </button>
+
+                                            <!-- RECURSIVE: Container for deeper nested replies -->
+                                            <div class="nested-replies-container"
+                                                 th:id="'nested-replies-' + ${nestedReply.replyId}"
+                                                 style="display: none;"
+                                                 th:if="${nestedReply.nestedReplies != null && !nestedReply.nestedReplies.isEmpty()}">
+                                                <!-- This would contain 3rd level replies - you can add same structure recursively -->
+                                                <!-- For now, showing them without further nesting to avoid infinite recursion in template -->
+                                                <div class="comment-item" th:each="deepReply : ${nestedReply.nestedReplies}">
+                                                    <div class="comment-avatar"
+                                                         th:text="${#strings.substring(deepReply.user.username, 0, 2).toUpperCase()}">
+                                                        UN
+                                                    </div>
+                                                    <div class="comment-content-wrapper">
+                                                        <div class="comment-header">
+                                                            <span class="comment-author" th:text="${deepReply.user.username}">Username</span>
+                                                            <span class="comment-date" th:text="${deepReply.replyDate}">Just now</span>
+                                                        </div>
+                                                        <div class="comment-text" th:text="${deepReply.replyText}">Deep nested reply...</div>
+                                                        <div class="comment-footer">
+                                                            <button class="comment-like-btn" th:onclick="'toggleReplyLike(' + ${deepReply.replyId} + ')'">
+                                                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/>
+                                                                </svg>
+                                                                <span th:text="${deepReply.likeCount != null ? deepReply.likeCount : 0}">1</span>
+                                                            </button>
+                                                            <button class="comment-reply-btn" th:onclick="'toggleNestedReplyBox(' + ${deepReply.replyId} + ', ' + ${c.reviewId} + ')'">
+                                                                Reply
+                                                            </button>
+                                                            <button class="comment-menu-btn" th:onclick="'toggleMenu(' + ${deepReply.replyId} + ')'">
+                                                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                                                                </svg>
+                                                            </button>
+                                                            <div class="comment-menu" th:id="'menu-' + ${deepReply.replyId}">
+                                                                <div class="menu-item delete"
+                                                                     th:if="${session.loggedUser != null && session.loggedUser.id == deepReply.user.id}"
+                                                                     th:onclick="'deleteReply(' + ${deepReply.replyId} + ')'">
+                                                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                                                    </svg>
+                                                                    Delete
+                                                                </div>
+                                                                <div class="menu-item"
+                                                                     th:if="${session.loggedUser == null || session.loggedUser.id != deepReply.user.id}"
+                                                                     th:onclick="'reportReply(' + ${deepReply.replyId} + ')'">
+                                                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
+                                                                    </svg>
+                                                                    Report
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Reply box for deep replies -->
+                                                        <div class="reply-box" th:id="'nested-reply-box-' + ${deepReply.replyId}">
+                                                            <div class="comment-avatar"
+                                                                 th:text="${session.loggedUser != null ? #strings.substring(session.loggedUser.username, 0, 2).toUpperCase() : '??'}">
+                                                                US
+                                                            </div>
+                                                            <div class="comment-input-wrapper">
+                                                                <form th:id="'nested-reply-form-' + ${deepReply.replyId}"
+                                                                      th:action="@{/addNestedReply}"
+                                                                      method="POST"
+                                                                      th:onsubmit="'return validateNestedReply(event, ' + ${deepReply.replyId} + ')'">
+                                                                    <input type="hidden" name="parentReplyId" th:value="${deepReply.replyId}"/>
+                                                                    <input type="hidden" name="reviewId" th:value="${c.reviewId}"/>
+                                                                    <input type="hidden" name="movieId" th:value="${movie.movieId}"/>
+                                                                    <textarea
+                                                                            class="comment-input"
+                                                                            th:id="'nested-reply-input-' + ${deepReply.replyId}"
+                                                                            name="replyText"
+                                                                            placeholder="Add a reply..."
+                                                                            rows="2"
+                                                                            maxlength="1000"
+                                                                            th:oninput="'enableNestedReplyButton(' + ${deepReply.replyId} + ')'"></textarea>
+                                                                    <div class="comment-actions">
+                                                                        <button type="button" class="comment-btn cancel-btn"
+                                                                                th:onclick="'cancelNestedReply(' + ${deepReply.replyId} + ')'">Cancel</button>
+                                                                        <button type="submit" class="comment-btn submit-comment-btn"
+                                                                                th:id="'nested-reply-submit-' + ${deepReply.replyId}" disabled>Reply</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>    </div>
+                        </div>
+                    </div>
+                    </div>
+</div>
+
+<!-- RATING MODAL -->
+<div class="modal-overlay" id="reviewModal">
+    <div class="review-modal">
+        <button class="modal-close" onclick="closeReviewModal()">×</button>
+        <form id="reviewForm" method="POST" action="/setRating" onsubmit="return f1()">
+            <div class="modal-header">
+                <div class="rate-label">RATE THIS MOVIE</div>
+                <h2 class="movie-title-modal" th:text="${movie.movieName}">Movie</h2>
+            </div>
+
+            <input type="hidden" name="movieId" th:value="${movie.movieId}"/>
+            <input type="hidden" name="rating" id="ratingInput" />
+
+            <div class="big-star">
+                <svg viewBox="0 0 24 24">
+                    <defs>
+                        <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#E91E63;stop-opacity:1"/>
+                            <stop offset="100%" style="stop-color:#9C27B0;stop-opacity:1"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                <div class="big-star-number" id="selectedRating">0</div>
+            </div>
+
+            <div class="star-rating-container">
+                <button type="button" class="star-btn empty" onclick="setRating(1)">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </button>
+                <button type="button" class="star-btn empty" onclick="setRating(2)">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </button>
+                <button type="button" class="star-btn empty" onclick="setRating(3)">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </button>
+                <button type="button" class="star-btn empty" onclick="setRating(4)">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </button>
+                <button type="button" class="star-btn empty" onclick="setRating(5)">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </button>
+            </div>
+
+            <div class="rating-description" id="ratingDescription">Select your rating</div>
+
+            <button type="submit" class="submit-btn">Submit Rating</button>
+        </form>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    // Poster Carousel
+    let posterSlideIndex = 0;
+    const posterWrapper = document.getElementById('posterCarouselWrapper');
+    const posterSlides = posterWrapper ? posterWrapper.children : [];
+    const totalPosterSlides = posterSlides.length;
+    const posterIndicatorsContainer = document.getElementById('posterIndicators');
+
+    if (posterIndicatorsContainer && totalPosterSlides > 0) {
+        for (let i = 0; i < totalPosterSlides; i++) {
+            const indicator = document.createElement('div');
+            indicator.className = 'poster-indicator';
+            if (i === 0) indicator.classList.add('active');
+            indicator.onclick = () => currentPosterSlide(i);
+            posterIndicatorsContainer.appendChild(indicator);
+        }
+    }
+
+    function showPosterSlide(n) {
+        if (n >= totalPosterSlides) posterSlideIndex = 0;
+        if (n < 0) posterSlideIndex = totalPosterSlides - 1;
+        if (posterWrapper) posterWrapper.style.transform = `translateX(-${posterSlideIndex * 100}%)`;
+        if (posterIndicatorsContainer) {
+            const indicators = posterIndicatorsContainer.children;
+            for (let i = 0; i < indicators.length; i++) {
+                indicators[i].classList.toggle('active', i === posterSlideIndex);
+            }
+        }
+    }
+
+    function changePosterSlide(n) {
+        posterSlideIndex += n;
+        showPosterSlide(posterSlideIndex);
+    }
+
+    function currentPosterSlide(n) {
+        posterSlideIndex = n;
+        showPosterSlide(posterSlideIndex);
+    }
+
+    if (totalPosterSlides > 1) {
+        setInterval(() => {
+            posterSlideIndex++;
+            showPosterSlide(posterSlideIndex);
+        }, 5000);
+    }
+
+    // Single Poster Carousel (Movie Info Section)
+    let singlePosterIndex = 0;
+    const singlePosterCarousel = document.getElementById('singlePosterCarousel');
+    const singlePosterSlides = singlePosterCarousel ? singlePosterCarousel.children : [];
+    const totalSinglePosterSlides = singlePosterSlides.length;
+    const singlePosterIndicatorsContainer = document.getElementById('singlePosterIndicators');
+
+    if (singlePosterIndicatorsContainer && totalSinglePosterSlides > 0) {
+        for (let i = 0; i < totalSinglePosterSlides; i++) {
+            const indicator = document.createElement('div');
+            indicator.className = 'single-indicator';
+            if (i === 0) indicator.classList.add('active');
+            indicator.onclick = () => currentSinglePosterSlide(i);
+            singlePosterIndicatorsContainer.appendChild(indicator);
+        }
+    }
+
+    function showSinglePosterSlide(n) {
+        if (n >= totalSinglePosterSlides) singlePosterIndex = 0;
+        if (n < 0) singlePosterIndex = totalSinglePosterSlides - 1;
+        if (singlePosterCarousel) singlePosterCarousel.style.transform = `translateX(-${singlePosterIndex * 100}%)`;
+        if (singlePosterIndicatorsContainer) {
+            const indicators = singlePosterIndicatorsContainer.children;
+            for (let i = 0; i < indicators.length; i++) {
+                indicators[i].classList.toggle('active', i === singlePosterIndex);
+            }
+        }
+    }
+
+    function changeSinglePosterSlide(n) {
+        singlePosterIndex += n;
+        showSinglePosterSlide(singlePosterIndex);
+    }
+
+    function currentSinglePosterSlide(n) {
+        singlePosterIndex = n;
+        showSinglePosterSlide(singlePosterIndex);
+    }
+
+    if (totalSinglePosterSlides > 1) {
+        setInterval(() => {
+            singlePosterIndex++;
+            showSinglePosterSlide(singlePosterIndex);
+        }, 5000);
+    }
+
+    // Rating Modal
+    let selectedRating = 0;
+
+    function openReviewModal() {
+        const modal = document.getElementById('reviewModal');
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeReviewModal() {
+        const modal = document.getElementById('reviewModal');
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            resetReview();
+        }
+    }
+
+    function setRating(rating) {
+        selectedRating = rating;
+        const selectedRatingEl = document.getElementById('selectedRating');
+        if (selectedRatingEl) selectedRatingEl.textContent = rating;
+        const ratingInput = document.getElementById('ratingInput');
+        if (ratingInput) ratingInput.value = rating;
+        const descriptions = {
+            1: "😞 Terrible",
+            2: "😐 Poor",
+            3: "🙂 Average",
+            4: "😊 Good",
+            5: "🤩 Excellent"
+        };
+        const descElement = document.getElementById('ratingDescription');
+        if (descElement) descElement.textContent = descriptions[rating] || 'Select your rating';
+        const stars = document.querySelectorAll('.star-btn');
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.remove('empty');
+                star.classList.add('filled');
+            } else {
+                star.classList.remove('filled');
+                star.classList.add('empty');
+            }
+        });
+    }
+
+    function resetReview() {
+        selectedRating = 0;
+        const selectedRatingEl = document.getElementById('selectedRating');
+        if (selectedRatingEl) selectedRatingEl.textContent = '0';
+        const ratingInput = document.getElementById('ratingInput');
+        if (ratingInput) ratingInput.value = '';
+        const descElement = document.getElementById('ratingDescription');
+        if (descElement) descElement.textContent = 'Select your rating';
+        const stars = document.querySelectorAll('.star-btn');
+        stars.forEach(star => {
+            star.classList.remove('filled');
+            star.classList.add('empty');
+        });
+    }
+
+    const reviewModal = document.getElementById('reviewModal');
+    if (reviewModal) {
+        reviewModal.addEventListener('click', function(e) {
+            if (e.target === this) closeReviewModal();
+        });
+    }
+
+    function f1() {
+        const ratingInput = document.getElementById('ratingInput');
+        const ratingValue = ratingInput ? parseInt(ratingInput.value) : 0;
+        const loggedUser = /*[[${session.loggedUser != null}]]*/ false;
+
+        if (!loggedUser) {
+            Swal.fire({
+                title: 'Login Required',
+                text: "You need to login first to rate this movie!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#E91E63',
+                confirmButtonText: 'Login Now'
+            }).then((result) => {
+                if (result.isConfirmed) window.location.href = '/login';
+            });
+            return false;
+        }
+
+        if (!ratingValue || ratingValue === 0) {
+            Swal.fire({
+                title: 'Rating Required',
+                text: 'Please select a rating before submitting!',
+                icon: 'info',
+                confirmButtonColor: '#E91E63'
+            });
+            return false;
+        }
+
+        return true;
+    }
+// ============================================
+    // COMMENT SECTION FUNCTIONALITY
+    // ============================================
+
+    // Add New Comment Box
+    const newCommentInput = document.getElementById('newCommentInput');
+    const commentActions = document.getElementById('commentActions');
+    const submitCommentBtn = document.getElementById('submitCommentBtn');
+
+    if (newCommentInput) {
+        newCommentInput.addEventListener('focus', function() {
+            if (commentActions) {
+                commentActions.style.display = 'flex';
+            }
+        });
+
+        newCommentInput.addEventListener('input', function() {
+            if (submitCommentBtn) {
+                submitCommentBtn.disabled = this.value.trim().length === 0;
+            }
+        });
+    }
+
+    // Validate comment form
+    function validateComment(event) {
+        event.preventDefault();
+
+        const commentText = document.getElementById('newCommentInput').value.trim();
+
+        if (!commentText) {
+            Swal.fire({
+                title: 'Empty Comment',
+                text: 'Please enter a comment before submitting.',
+                icon: 'warning',
+                confirmButtonColor: '#f57420'
+            });
+            return false;
+        }
+
+        // Check if user is logged in
+        const isUserNull = /*[[${session.loggedUser == null}]]*/ true;
+
+        if (isUserNull) {
+            Swal.fire({
+                title: 'Login Required',
+                text: "You need to login first to comment!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f57420',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Login Now',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/login';
+                }
+            });
+            return false;
+        }
+
+        // Submit the form
+        document.getElementById('addCommentForm').submit();
+        return true;
+    }
+
+    function cancelComment() {
+        const newCommentInput = document.getElementById('newCommentInput');
+        const commentActions = document.getElementById('commentActions');
+        const submitCommentBtn = document.getElementById('submitCommentBtn');
+
+        if (newCommentInput) {
+            newCommentInput.value = '';
+            newCommentInput.blur();
+        }
+        if (commentActions) {
+            commentActions.style.display = 'none';
+        }
+        if (submitCommentBtn) {
+            submitCommentBtn.disabled = true;
+        }
+    }
+
+    // Toggle Reply Box
+    function toggleReplyBox(commentId) {
+        const replyBox = document.getElementById('reply-box-' + commentId);
+        if (!replyBox) return;
+
+        if (replyBox.classList.contains('active')) {
+            replyBox.classList.remove('active');
+        } else {
+            // Close all other reply boxes
+            document.querySelectorAll('.reply-box').forEach(box => {
+                box.classList.remove('active');
+            });
+            replyBox.classList.add('active');
+
+            const replyInput = document.getElementById('reply-input-' + commentId);
+            if (replyInput) {
+                replyInput.focus();
+            }
+        }
+    }
+    // Toggle Reply Like
+function toggleReplyLike(replyId) {
+    // Check if user is logged in
+    const isUserNull = /*[[${session.loggedUser == null}]]*/ true;
+
+    if (isUserNull) {
+        Swal.fire({
+            title: 'Login Required',
+            text: "You need to login first to like replies!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f57420',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Login Now',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/login';
+            }
+        });
+        return;
+    }
+
+    // Toggle like on backend
+    fetch('/toggleReplyLike/' + replyId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+    })
+    .then(data => {
+        // Reload to update UI
+        location.reload();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'Failed to update like. Please try again.',
+            icon: 'error',
+            confirmButtonColor: '#f57420'
+        });
+    });
+}
+
+// Toggle Nested Reply Box
+function toggleNestedReplyBox(replyId, commentId) {
+    const nestedReplyBox = document.getElementById('nested-reply-box-' + replyId);
+    if (!nestedReplyBox) return;
+
+    if (nestedReplyBox.classList.contains('active')) {
+        nestedReplyBox.classList.remove('active');
+    } else {
+        // Close all other nested reply boxes
+        document.querySelectorAll('.reply-box').forEach(box => {
+            box.classList.remove('active');
+        });
+        nestedReplyBox.classList.add('active');
+
+        const nestedReplyInput = document.getElementById('nested-reply-input-' + replyId);
+        if (nestedReplyInput) {
+            nestedReplyInput.focus();
+        }
+    }
+}
+
+// Cancel Nested Reply
+function cancelNestedReply(replyId) {
+    const nestedReplyBox = document.getElementById('nested-reply-box-' + replyId);
+    const nestedReplyInput = document.getElementById('nested-reply-input-' + replyId);
+
+    if (nestedReplyInput) {
+        nestedReplyInput.value = '';
+    }
+    if (nestedReplyBox) {
+        nestedReplyBox.classList.remove('active');
+    }
+}
+
+// Enable Nested Reply Button
+function enableNestedReplyButton(replyId) {
+    const nestedReplyInput = document.getElementById('nested-reply-input-' + replyId);
+    const submitBtn = document.getElementById('nested-reply-submit-' + replyId);
+
+    if (nestedReplyInput && submitBtn) {
+        submitBtn.disabled = nestedReplyInput.value.trim().length === 0;
+    }
+}
+
+// Validate Nested Reply Form
+function validateNestedReply(event, replyId) {
+    event.preventDefault();
+
+    const nestedReplyInput = document.getElementById('nested-reply-input-' + replyId);
+    const replyText = nestedReplyInput ? nestedReplyInput.value.trim() : '';
+
+    if (!replyText) {
+        Swal.fire({
+            title: 'Empty Reply',
+            text: 'Please enter a reply before submitting.',
+            icon: 'warning',
+            confirmButtonColor: '#f57420'
+        });
+        return false;
+    }
+
+    // Check if user is logged in
+    const isUserNull = /*[[${session.loggedUser == null}]]*/ true;
+
+    if (isUserNull) {
+        Swal.fire({
+            title: 'Login Required',
+            text: "You need to login first to reply!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f57420',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Login Now',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/login';
+            }
+        });
+        return false;
+    }
+
+    // Submit the form
+    document.getElementById('nested-reply-form-' + replyId).submit();
+    return true;
+}
+
+// Delete Reply
+function deleteReply(replyId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#f57420',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = '/deleteReply/' + replyId;
+        }
+    });
+}
+
+// Report Reply
+function reportReply(replyId) {
+    Swal.fire({
+        title: 'Report Reply',
+        text: "Why are you reporting this reply?",
+        input: 'select',
+        inputOptions: {
+            'spam': 'Spam or misleading',
+            'harassment': 'Harassment or hate speech',
+            'inappropriate': 'Inappropriate content',
+            'violence': 'Violence or harmful behavior',
+            'other': 'Other'
+        },
+        inputPlaceholder: 'Select a reason',
+        showCancelButton: true,
+        confirmButtonColor: '#f57420',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Report',
+        cancelButtonText: 'Cancel',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'You need to select a reason!';
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('/reportReply/' + replyId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    reason: result.value
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    title: 'Reported!',
+                    text: 'Thank you for your report. We will review it shortly.',
+                    icon: 'success',
+                    confirmButtonColor: '#f57420'
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to submit report. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#f57420'
+                });
+            });
+        }
+    });
+}
+
+
+    // Cancel Reply
+    function cancelReply(commentId) {
+        const replyBox = document.getElementById('reply-box-' + commentId);
+        const replyInput = document.getElementById('reply-input-' + commentId);
+
+        if (replyInput) {
+            replyInput.value = '';
+        }
+        if (replyBox) {
+            replyBox.classList.remove('active');
+        }
+    }
+
+    // Submit Reply with Form
+    function submitReply(commentId) {
+        const replyInput = document.getElementById('reply-input-' + commentId);
+        const replyText = replyInput ? replyInput.value.trim() : '';
+
+        if (!replyText) {
+            Swal.fire({
+                title: 'Empty Reply',
+                text: 'Please enter a reply before submitting.',
+                icon: 'warning',
+                confirmButtonColor: '#f57420'
+            });
+            return false;
+        }
+
+        // Check if user is logged in
+        const isUserNull = /*[[${session.loggedUser == null}]]*/ true;
+
+        if (isUserNull) {
+            Swal.fire({
+                title: 'Login Required',
+                text: "You need to login first to reply!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f57420',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Login Now',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/login';
+                }
+            });
+            return false;
+        }
+
+        // Submit the form
+        document.getElementById('reply-form-' + commentId).submit();
+        return true;
+    }
+
+    // Toggle Three-Dot Menu
+    function toggleMenu(commentId) {
+        const menu = document.getElementById('menu-' + commentId);
+        if (!menu) return;
+
+        const allMenus = document.querySelectorAll('.comment-menu');
+
+        // Close all other menus
+        allMenus.forEach(m => {
+            if (m !== menu) m.classList.remove('active');
+        });
+
+        menu.classList.toggle('active');
+    }
+
+    // Close menus when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.comment-menu-btn') && !e.target.closest('.comment-menu')) {
+            document.querySelectorAll('.comment-menu').forEach(menu => {
+                menu.classList.remove('active');
+            });
+        }
+    });
+
+    // Toggle Nested Replies Visibility
+function toggleNestedReplies(replyId) {
+    const nestedRepliesList = document.getElementById('nested-replies-' + replyId);
+    const viewNestedRepliesBtn = document.getElementById('view-nested-replies-' + replyId);
+
+    if (!nestedRepliesList || !viewNestedRepliesBtn) return;
+
+    if (nestedRepliesList.style.display === 'none' || nestedRepliesList.style.display === '') {
+        // Show nested replies
+        nestedRepliesList.style.display = 'flex';
+        viewNestedRepliesBtn.classList.add('expanded');
+    } else {
+        // Hide nested replies
+        nestedRepliesList.style.display = 'none';
+        viewNestedRepliesBtn.classList.remove('expanded');
+    }
+}
+
+    // Toggle Like on Comment
+    function toggleLike(commentId) {
+        // Check if user is logged in
+        const isUserNull = /*[[${session.loggedUser == null}]]*/ true;
+
+        if (isUserNull) {
+            Swal.fire({
+                title: 'Login Required',
+                text: "You need to login first to like comments!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f57420',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Login Now',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/login';
+                }
+            });
+            return;
+        }
+
+        // Toggle like on backend
+        fetch('/toggleCommentLike/' + commentId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            // Reload to update UI
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to update like. Please try again.',
+                icon: 'error',
+                confirmButtonColor: '#f57420'
+            });
+        });
+    }
+
+    // Edit Comment
+    function editComment(commentId) {
+        // Get current comment text (you might need to pass this)
+        Swal.fire({
+            title: 'Edit Comment',
+            input: 'textarea',
+            inputPlaceholder: 'Edit your comment...',
+            inputAttributes: {
+                'aria-label': 'Edit your comment'
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#f57420',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Save Changes',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'You need to write something!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                // Submit edited comment to backend
+                fetch('/editComment/' + commentId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        comment: result.value
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.fire({
+                        title: 'Updated!',
+                        text: 'Your comment has been updated.',
+                        icon: 'success',
+                        confirmButtonColor: '#f57420'
+                    }).then(() => {
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to update comment. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#f57420'
+                    });
+                });
+            }
+        });
+    }
+
+    // Delete Comment
+    function deleteComment(commentId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f57420',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit delete request
+                window.location.href = '/deleteComment/' + commentId;
+            }
+        });
+    }
+
+    // Report Comment
+    function reportComment(commentId) {
+        Swal.fire({
+            title: 'Report Comment',
+            text: "Why are you reporting this comment?",
+            input: 'select',
+            inputOptions: {
+                'spam': 'Spam or misleading',
+                'harassment': 'Harassment or hate speech',
+                'inappropriate': 'Inappropriate content',
+                'violence': 'Violence or harmful behavior',
+                'other': 'Other'
+            },
+            inputPlaceholder: 'Select a reason',
+            showCancelButton: true,
+            confirmButtonColor: '#f57420',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Report',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'You need to select a reason!';
+                }
+            }
+
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit report to backend
+                fetch('/reportset/' + commentId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        reason: result.value
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.fire({
+                        title: 'Reported!',
+                        text: 'Thank you for your report. We will review it shortly.',
+                        icon: 'success',
+                        confirmButtonColor: '#f57420'
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to submit report. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#f57420'
+                    });
+                });
+            }
+        });
+    }
+
+
+    // Enable Reply Button on Input
+function enableReplyButton(commentId) {
+    const replyInput = document.getElementById('reply-input-' + commentId);
+    const submitBtn = document.getElementById('reply-submit-' + commentId);
+
+    if (replyInput && submitBtn) {
+        submitBtn.disabled = replyInput.value.trim().length === 0;
+    }
+}
+
+// Validate Reply Form
+function validateReply(event, commentId) {
+    event.preventDefault();
+
+    const replyInput = document.getElementById('reply-input-' + commentId);
+    const replyText = replyInput ? replyInput.value.trim() : '';
+
+    if (!replyText) {
+        Swal.fire({
+            title: 'Empty Reply',
+            text: 'Please enter a reply before submitting.',
+            icon: 'warning',
+            confirmButtonColor: '#f57420'
+        });
+        return false;
+    }
+
+    // Check if user is logged in
+    const isUserNull = /*[[${session.loggedUser == null}]]*/ true;
+
+    if (isUserNull) {
+        Swal.fire({
+            title: 'Login Required',
+            text: "You need to login first to reply!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f57420',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Login Now',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/login';
+            }
+        });
+        return false;
+    }
+
+    // Submit the form
+    document.getElementById('reply-form-' + commentId).submit();
+    return true;
+}
+
+    // Toggle Replies Visibility
+    function toggleReplies(commentId) {
+        const repliesList = document.getElementById('replies-' + commentId);
+        const viewRepliesBtn = document.getElementById('view-replies-' + commentId);
+
+        if (!repliesList || !viewRepliesBtn) return;
+
+        if (repliesList.style.display === 'none' || repliesList.style.display === '') {
+            // Show replies
+            repliesList.style.display = 'flex';
+            viewRepliesBtn.classList.add('expanded');
+
+            // Fetch replies from backend if not already loaded
+            if (repliesList.children.length === 0) {
+                fetchReplies(commentId);
+            }
+        } else {
+            // Hide replies
+            repliesList.style.display = 'none';
+            viewRepliesBtn.classList.remove('expanded');
+        }
+    }
+
+    // Fetch Replies from Backend
+    function fetchReplies(commentId) {
+        const repliesList = document.getElementById('replies-' + commentId);
+        if (!repliesList) return;
+
+        // Show loading state
+        repliesList.innerHTML = '<div style="padding: 1rem; text-align: center; color: #999;">Loading replies...</div>';
+
+        fetch('/getReplies/' + commentId)
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            // Clear loading message
+            repliesList.innerHTML = '';
+
+            // Render replies
+            if (data && data.length > 0) {
+                data.forEach(reply => {
+                    const replyHTML = createReplyHTML(reply);
+                    repliesList.innerHTML += replyHTML;
+                });
+            } else {
+                repliesList.innerHTML = '<div style="padding: 1rem; text-align: center; color: #999;">No replies yet.</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            repliesList.innerHTML = '<div style="padding: 1rem; text-align: center; color: #dc3545;">Failed to load replies.</div>';
+        });
+    }
+
+    // Create Reply HTML (helper function)
+    function createReplyHTML(reply) {
+        // This is a template - adjust according to your data structure
+        return `
+            <div class="comment-item">
+                <div class="comment-avatar">${reply.userInitials || 'UN'}</div>
+                <div class="comment-content-wrapper">
+                    <div class="comment-header">
+                        <span class="comment-author">${reply.username || 'Anonymous'}</span>
+                        <span class="comment-date">${reply.date || 'Just now'}</span>
+                    </div>
+                    <div class="comment-text">${reply.text || ''}</div>
+                    <div class="comment-footer">
+                        <button class="comment-like-btn" onclick="toggleLike(${reply.id})">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/>
+                            </svg>
+                            <span>${reply.likes || 0}</span>
+                        </button>
+                        <button class="comment-reply-btn" onclick="toggleReplyBox(${reply.id})">Reply</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ============================================
+    // CAST RATING SUCCESS ALERT
+    // ============================================
+    // This will be populated by Thymeleaf
+    let castRateSuccess = false; // Will be: [[${CastRateSuccess} ? 'true' : 'false']];
+
+    if (castRateSuccess === 'true' || castRateSuccess === true) {
+        Swal.fire({
+            title: "Thank You!",
+            text: "Your cast rating has been submitted successfully.",
+            icon: "success",
+            confirmButtonColor: '#f57420'
+        });
+    }
+</script>
+</body>
+</html>
