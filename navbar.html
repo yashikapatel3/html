@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="nav">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      padding-top: 100px;
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, #cb0350 0%, #010003 100%);
+      border-radius: 50px;
+      height: auto;
+      padding: 0px 25px;
+      margin: 5px 20px 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      animation: slideDown 0.5s ease-out;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+
+    .navbar-brand {
+      font-family: 'Monoton', cursive;
+      word-spacing: 5px;
+      font-size: 25px;
+      color: #fff !important;
+      text-transform: lowercase;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      animation: glow 2s ease-in-out infinite alternate;
+      white-space: nowrap;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 10px rgba(255,255,255,0.5); }
+      to   { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.6); }
+    }
+
+    .navbar-brand:hover { transform: scale(1.05) rotate(-2deg); }
+
+    .logo-img {
+      animation: rotate 3s linear infinite;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+    .logo-img:hover { animation-play-state: paused; transform: scale(1.1); }
+    @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .nav-items-container { display: flex; align-items: center; gap: 15px; }
+
+    .nav-item-custom {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-item-custom::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.2);
+      transition: left 0.3s ease;
+    }
+    .nav-item-custom:hover::before { left: 100%; }
+    .nav-item-custom:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .nav-icon { font-size: 24px; margin-bottom: 5px; animation: bounce 2s ease-in-out infinite; }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    .nav-item-custom:hover .nav-icon { animation: shake 0.5s ease-in-out; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px) rotate(-5deg); } 75% { transform: translateX(5px) rotate(5deg); } }
+
+    .nav-label { font-size: 12px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+
+    .nav-item-custom.active {
+      background: rgba(255,255,255,0.25);
+      box-shadow: 0 0 20px rgba(255,255,255,0.5);
+    }
+    .nav-item-custom.active .nav-icon { animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+    .search-container { position: relative; animation: fadeIn 0.8s ease-out 0.3s both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+    .nav-search {
+      border-radius: 25px;
+      border: 2px solid rgba(255,255,255,0.3);
+      padding: 10px 40px 10px 20px;
+      width: 300px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+    .nav-search::placeholder { color: rgba(255,255,255,0.7); }
+    .nav-search:focus { box-shadow: 0 0 20px rgba(255,255,255,0.4); outline: none; background: rgba(255,255,255,0.25); width: 300px; }
+
+    .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #fff; pointer-events: none; animation: searchPulse 2s ease-in-out infinite; }
+    @keyframes searchPulse { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
+
+    /* ── Search Results Dropdown ── */
+    .search-result-box {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 380px;
+      max-height: 420px;
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+      display: none;
+      z-index: 3000;
+      backdrop-filter: blur(10px);
+      animation: dropDown 0.3s ease-out;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    @keyframes dropDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Section Labels inside dropdown */
+    .result-section-label {
+      padding: 8px 14px 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #aaa;
+      border-top: 1px solid #f0f0f0;
+    }
+    .result-section-label:first-child { border-top: none; }
+
+    .search-item {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+      /* Reset ALL anchor tag defaults */
+      color: #333 !important;
+      text-decoration: none !important;
+      font-size: 14px !important;
+      font-weight: 400;
+      font-family: 'Poppins', sans-serif;
+      background: #fff;
+      width: 100%;
+      box-sizing: border-box;
+      line-height: 1.4;
+    }
+    .search-item:visited { color: #333 !important; text-decoration: none !important; }
+    .search-item:last-child { border-bottom: none; }
+    .search-item:hover {
+      background: linear-gradient(135deg, #fce4ec, #f3e5f5) !important;
+      color: #c62828 !important;
+      text-decoration: none !important;
+      transform: translateX(4px);
+    }
+
+    .search-item-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #cb0350, #760313);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .search-item-info { flex: 1; min-width: 0; }
+    .search-item-name { font-size: 14px; font-weight: 600; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .search-item-type { font-size: 11px; color: #888; margin-top: 1px; }
+    .search-item:hover .search-item-name { color: #c62828; }
+
+    .no-results { padding: 20px; text-align: center; color: #999; font-size: 14px; }
+
+    /* Sign In / Profile */
+    .btn-nav-custom {
+      background: linear-gradient(135deg, #e80266 0%, #760313 100%);
+      border: none; padding: 10px 25px; border-radius: 25px;
+      font-weight: 600; color: #fff !important;
+      box-shadow: 0 4px 15px rgba(245,87,108,0.4);
+      transition: all 0.3s ease;
+      animation: fadeIn 1s ease-out 0.5s both;
+      white-space: nowrap;
+    }
+    .btn-nav-custom:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 6px 20px rgba(245,87,108,0.6); }
+    .btn-nav-custom:active { transform: translateY(0) scale(0.98); }
+
+    .profile-btn {
+      width: 50px; height: 50px; border-radius: 50%;
+      border: 3px solid rgb(247,115,148);
+      display: flex; align-items: start; justify-content: center;
+      transition: all 0.3s ease;
+      animation: fadeIn 1s ease-out 0.5s both;
+      flex-shrink: 0; overflow: hidden; padding: 0;
+    }
+    .profile-btn:hover { transform: rotate(360deg) scale(1.1); box-shadow: 0 0 25px rgba(245,87,108,0.8); }
+    .profile-btn img { width: 100%; height: 100%; object-fit: cover; }
+
+    .rounded-circle {
+      border: 2px solid rgba(255,255,255,0.5); padding: 0;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 0 20px rgba(245,103,138,0.6);
+      transition: all 0.4s ease;
+    }
+
+    .brand-container { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+    /* Mobile Search */
+    .mobile-search {
+      display: none;
+      position: fixed; top: 90px; left: 20px; right: 20px;
+      width: calc(100% - 40px);
+      background: rgba(255,255,255,0.97);
+      padding: 15px; border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      z-index: 2000; backdrop-filter: blur(10px);
+      animation: dropDown 0.3s ease-out;
+    }
+    .mobile-search input {
+      background: rgba(102,126,234,0.1);
+      border: 2px solid #667eea;
+      border-radius: 25px; padding: 10px 15px;
+      color: #333; width: 100%;
+    }
+    .mobile-search .search-result-box {
+      position: relative; top: 0; width: 100%; margin-top: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .mobile-search-icon { cursor: pointer; transition: all 0.3s ease; animation: fadeIn 1s ease-out 0.5s both; flex-shrink: 0; }
+    .mobile-search-icon:hover { transform: scale(1.2) rotate(90deg); }
+
+    /* Scrollbar */
+    .search-result-box::-webkit-scrollbar { width: 6px; }
+    .search-result-box::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 10px; }
+    .search-result-box::-webkit-scrollbar-thumb { background: #cb0350; border-radius: 10px; }
+
+    /* Responsive */
+    @media (max-width: 991px) {
+      body { padding-top: 85px; }
+      .navbar { margin: 10px; padding: 12px 15px; border-radius: 25px; }
+      .logo-img { width: 40px; height: 40px; }
+      .navbar-brand { font-size: 20px; }
+      .desktop-search { display: none; }
+      .navbar-toggler { padding: 8px; font-size: 20px; }
+      .nav-items-container { flex-direction: column; gap: 8px; width: 100%; margin-top: 15px; }
+      .nav-item-custom { width: 100%; flex-direction: row; justify-content: flex-start; gap: 15px; padding: 12px 15px; }
+      .nav-icon { margin-bottom: 0; font-size: 20px; }
+      .nav-label { font-size: 14px; }
+      .btn-nav-custom, .profile-btn { width: auto; margin-top: 10px; margin-left: 0 !important; }
+      .btn-nav-custom { padding: 12px 20px; text-align: center; }
+      .profile-btn { width: 45px; height: 45px; border-radius: 25px; justify-content: center; }
+      .mobile-search { top: 75px; }
+    }
+
+    @media (max-width: 576px) {
+      body { padding-top: 80px; }
+      .navbar { margin: 8px; padding: 10px 12px; border-radius: 20px; }
+      .logo-img { width: 35px; height: 35px; }
+      .navbar-brand { font-size: 18px; }
+      .mobile-search { top: 70px; left: 8px; right: 8px; width: calc(100% - 16px); padding: 12px; }
+      .search-item { padding: 10px 12px; font-size: 14px; }
+      .search-result-box { width: 320px; }
+    }
+
+    @media (max-width: 380px) {
+      .navbar-brand { font-size: 16px; word-spacing: 2px; }
+      .logo-img { width: 32px; height: 32px; }
+      .nav-label { font-size: 12px; }
+    }
+
+    @media (min-width: 992px) {
+      .mobile-search-icon { display: none !important; }
+      body { padding-top: 100px; }
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container-fluid">
+    <div class="brand-container">
+      <img th:src="@{/images/logo2.jpg}" width="52" height="52" class="rounded-circle logo-img" alt="logo">
+      <a class="navbar-brand" th:href="@{/home}">KAISI LAGI</a>
+    </div>
+
+    <i class="fas fa-search text-light fs-5 ms-auto me-3 mobile-search-icon" id="mobileSearchToggle"></i>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="fa fa-ellipsis-v text-light"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <div class="desktop-search search-container position-relative ms-auto me-3">
+        <input type="text" id="desktopSearch" class="nav-search" placeholder="Search movies, people..."
+               autocomplete="off">
+        <i class="fas fa-search search-icon"></i>
+        <div id="desktopResultBox" class="search-result-box"></div>
+      </div>
+
+      <div class="nav-items-container ms-lg-auto">
+        <a class="nav-item-custom" th:href="@{/home}"
+           th:classappend="${activePage == 'home'} ? 'active' : ''">
+          <i class="fas fa-home nav-icon"></i>
+          <span class="nav-label">Home</span>
+        </a>
+        <a class="nav-item-custom" th:href="@{/showpeoplerevi}"
+           th:classappend="${activePage == 'leaderboard'} ? 'active' : ''">
+          <i class="fas fa-trophy nav-icon"></i>
+          <span class="nav-label">Leaderboard</span>
+        </a>
+        <a th:if="${session.loggedUser != null and session.loggedUser.role.name() == 'ADMIN'}"
+           class="nav-item-custom"
+           th:classappend="${activePage == 'dashboard'} ? 'active' : ''"
+           th:href="@{/dashboard}">
+          <i class="fas fa-chart-line nav-icon"></i>
+          <span class="nav-label">Dashboard</span>
+        </a>
+      </div>
+
+      <a th:if="${session.loggedUser == null}"
+         class="btn btn-nav-custom ms-lg-3 mt-2 mt-lg-0" th:href="@{/login}">
+        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+      </a>
+      <a th:if="${session.loggedUser != null}"
+         class="btn profile-btn ms-lg-3 mt-2 mt-lg-0"
+         th:classappend="${activePage == 'profile'} ? 'active' : ''"
+         th:href="@{/profile}">
+        <img th:src="${photo != null} ? 'data:image/jpeg;base64,' + ${photo} : @{/images/default.png}"
+             alt="Profile Picture" class="rounded-circle"/>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Search Box -->
+<div class="mobile-search" id="mobileSearchBox">
+  <input type="text" id="mobileSearchInput" class="form-control mb-2"
+         placeholder="Search movies, people..." autocomplete="off">
+  <div id="mobileResultBox" class="search-result-box"></div>
+</div>
+
+<script>
+  /* ─── Icon map for people types ─── */
+  const PEOPLE_ICONS = {
+    'Actor':         '🎭',
+    'Actress':       '👩‍🎤',
+    'Director':      '🎬',
+    'MusicDirector': '🎵',
+     };
+
+  /* ─── Build HTML for one result box ─── */
+  function buildResultsHTML(data) {
+    let html = '';
+
+    // ── Movies ──
+    if (data.movies && data.movies.length > 0) {
+      html += `<div class="result-section-label">🎬 Movies</div>`;
+      data.movies.forEach(m => {
+        /* FIX: use /movie/{id} — adjust if your route differs */
+        html += `
+          <a class="search-item" href="/movie/${m.id}">
+            <div class="search-item-icon">🎬</div>
+            <div class="search-item-info">
+              <div class="search-item-name">${escapeHtml(m.name)}</div>
+              <div class="search-item-type">Movie</div>
+            </div>
+          </a>`;
+      });
+    }
+
+    // ── People ──
+    if (data.people && data.people.length > 0) {
+      html += `<div class="result-section-label">👤 People</div>`;
+      data.people.forEach(p => {
+        const icon  = PEOPLE_ICONS[p.type] || '👤';
+        /* ✅ FIX: was /person/${p.id} → now /people/${p.id} */
+        html += `
+          <a class="search-item" href="/people/${p.id}">
+            <div class="search-item-icon">${icon}</div>
+            <div class="search-item-info">
+              <div class="search-item-name">${escapeHtml(p.name)}</div>
+              <div class="search-item-type">${escapeHtml(p.type || 'Person')}</div>
+            </div>
+          </a>`;
+      });
+    }
+
+    if (!html) {
+      html = `<div class="no-results">
+                <i class="fas fa-search" style="font-size:1.5rem;opacity:.3;display:block;margin-bottom:8px;"></i>
+                No results found
+              </div>`;
+    }
+
+    return html;
+  }
+
+  /* ─── HTML escape helper ─── */
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ─── Debounce ─── */
+  function debounce(fn, delay) {
+    let timer;
+    return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), delay); };
+  }
+
+  /* ─── Attach search to an input + result box pair ─── */
+  function attachSearch(inputEl, resultBox) {
+    if (!inputEl || !resultBox) return;
+
+    const doSearch = debounce((q) => {
+      if (q.length < 1) { resultBox.style.display = 'none'; return; }
+
+      fetch('/search/api?q=' + encodeURIComponent(q))
+        .then(res => res.json())
+        .then(data => {
+        resultBox.innerHTML = buildResultsHTML(data);
+        resultBox.style.display = 'block';
+      })
+        .catch(() => { resultBox.style.display = 'none'; });
+    }, 250);
+
+    inputEl.addEventListener('input', () => doSearch(inputEl.value.trim()));
+
+    /* Close on Escape */
+    inputEl.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { resultBox.style.display = 'none'; inputEl.blur(); }
+    });
+  }
+
+  // Desktop
+  attachSearch(
+    document.getElementById('desktopSearch'),
+    document.getElementById('desktopResultBox')
+  );
+
+  // Mobile
+  attachSearch(
+    document.getElementById('mobileSearchInput'),
+    document.getElementById('mobileResultBox')
+  );
+
+  /* ─── Mobile search toggle ─── */
+  document.getElementById('mobileSearchToggle')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const box = document.getElementById('mobileSearchBox');
+    const isVisible = box.style.display === 'block';
+    box.style.display = isVisible ? 'none' : 'block';
+    if (!isVisible) {
+      setTimeout(() => document.getElementById('mobileSearchInput')?.focus(), 100);
+    }
+  });
+
+  /* ─── Close dropdowns on outside click ─── */
+  document.addEventListener('click', (e) => {
+    const desktopSearch  = document.getElementById('desktopSearch');
+    const desktopResult  = document.getElementById('desktopResultBox');
+    const mobileBox      = document.getElementById('mobileSearchBox');
+    const mobileToggle   = document.getElementById('mobileSearchToggle');
+
+    if (desktopSearch && desktopResult &&
+    !desktopSearch.contains(e.target) && !desktopResult.contains(e.target)) {
+      desktopResult.style.display = 'none';
+    }
+    if (mobileBox && mobileToggle &&
+    !mobileBox.contains(e.target) && !mobileToggle.contains(e.target)) {
+      mobileBox.style.display = 'none';
+    }
+  });
+
+  /* ─── Navbar collapse on mobile ─── */
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggler   = document.querySelector('.navbar-toggler');
+    const collapseEl = document.getElementById('navbarNav');
+    if (!toggler || !collapseEl) return;
+
+    const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: false });
+    const isMobile   = () => window.innerWidth <= 991;
+
+    toggler.addEventListener('mouseenter',  () => { if (isMobile()) bsCollapse.show(); });
+    toggler.addEventListener('touchstart',  () => { if (isMobile()) bsCollapse.show(); }, { passive: true });
+    collapseEl.addEventListener('mouseleave', () => { if (isMobile()) bsCollapse.hide(); });
+
+    document.addEventListener('click', (e) => {
+      if (!isMobile()) return;
+      if (!toggler.contains(e.target) && !collapseEl.contains(e.target) && collapseEl.classList.contains('show')) {
+        bsCollapse.hide();
+      }
+    });
+
+    window.addEventListener('resize', () => { if (!isMobile()) bsCollapse.hide(); });
+  });
+</script>
+</body>
+</html>
