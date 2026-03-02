@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Badge Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-image: url("/photos/bb.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        -webkit-font-smoothing: antialiased;
+        height: 100vh;
+        padding: 80px 0 40px;
+        color: #f0f4f8;
+    }
+
+    h2 {
+        font-family: 'Monoton', cursive;
+        text-align: center;
+        color: #ffffff !important;
+        font-weight: 500;
+        margin-bottom: 40px;
+        font-size: 2.2rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    /* SIDEBAR */
+    :root {
+        --sidebar-width: 250px;
+        --primary-bg: #1d000a;
+        --sidebar-bg: rgba(199, 188, 191, 0.21);
+        --sidebar-border: #eb2d5d;
+    }
+
+    .layout { display: flex; gap: 18px; }
+
+    .sidebar {
+        color: #ffffff;
+        width: 250px;
+        margin-top: 10px;
+        background: linear-gradient(145deg, rgba(102, 145, 160, 0.4), rgba(125, 1, 34, 0.522));
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-left: 4px solid var(--sidebar-border);
+        padding: 20px;
+        height: calc(100vh - 100px);
+        border-radius: 12px;
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+        position: sticky;
+        top: 100px;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .sidebar nav a {
+        display: block;
+        padding: 12px 15px;
+        margin-bottom: 8px;
+        border-radius: 10px;
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar nav a i { margin-right: 8px; }
+
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
+        background: rgba(250, 234, 238, 0.3);
+        color: #fff;
+        text-shadow: 0 0 8px #ff0080;
+        transform: translateX(5px);
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 18px;
+        background-color: transparent;
+        min-width: 0;
+    }
+
+    .sidebar .rounded-circle {
+        border: 2px solid var(--accent);
+        padding: 2px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 0 20px rgba(245, 103, 138, 0.6);
+        transition: all 0.4s ease;
+    }
+
+    .sidebar .rounded-circle:hover {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 0 30px rgba(235, 45, 93, 1);
+    }
+
+    .sidebar h6 {
+        color: #ffffff !important;
+        text-shadow: 0 2px 15px rgba(235, 45, 93, 0.8);
+        animation: glow 2s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+        0%, 100% { text-shadow: 0 2px 15px rgba(235, 45, 93, 0.8); }
+        50% { text-shadow: 0 2px 25px rgba(235, 45, 93, 1); }
+    }
+
+    /* GLASS TABLE */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+    }
+
+    .glass-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: transparent;
+        color: #f0f4f8;
+        margin: 0;
+    }
+
+    .glass-table thead tr {
+        background: rgba(3, 3, 3, 0.25);
+        border-bottom: 1px solid rgba(249, 216, 29, 0.5);
+    }
+
+    .glass-table thead th {
+        padding: 14px 16px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #ffd6e0;
+        text-align: center;
+        border: none;
+        white-space: nowrap;
+    }
+
+    .glass-table tbody tr {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        transition: background 0.2s ease;
+    }
+
+    .glass-table tbody tr:hover { background: rgba(235, 45, 93, 0.12); }
+    .glass-table tbody tr:last-child { border-bottom: none; }
+
+    .glass-table tbody td {
+        padding: 14px 16px;
+        text-align: center;
+        vertical-align: middle;
+        border: none;
+        font-size: 0.92rem;
+        color: #f0f4f8;
+        background: transparent;
+    }
+
+    .badge-icon {
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(235, 45, 93, 0.35);
+        object-fit: cover;
+    }
+
+    .reviews-badge {
+        display: inline-block;
+        background: rgba(13, 202, 240, 0.552);
+        color: #ffffff;
+        border: 1px solid rgba(13, 202, 240, 0.4);
+        border-radius: 20px;
+        padding: 3px 14px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+    }
+
+    .btn-glass-warning {
+        background: rgba(255, 193, 7, 0.854);
+        border: 1px solid rgba(255, 193, 7, 0.5);
+        color: #ffffff;
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .btn-glass-warning:hover {
+        background: rgba(255, 191, 0, 0.963);
+        color: #fff;
+        box-shadow: 0 0 12px rgba(255, 193, 7, 0.4);
+    }
+
+    .btn-glass-danger {
+        background: rgba(241, 33, 54, 0.853);
+        border: 1px solid rgba(220, 53, 69, 0.5);
+        color: #ffffff;
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .btn-glass-danger:hover {
+        background: rgba(238, 1, 25, 0.807);
+        color: #fff;
+        box-shadow: 0 0 12px rgba(220, 53, 69, 0.4);
+    }
+
+    .btn-glass-primary {
+        background: rgba(13, 109, 253, 0.795);
+        border: 1px solid rgba(13, 109, 253, 0.959);
+        color: #ffffff;
+        border-radius: 10px;
+        padding: 7px 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-glass-primary:hover {
+        background: rgba(13, 110, 253, 0.45);
+        color: #fff;
+        box-shadow: 0 0 16px rgba(13, 110, 253, 0.4);
+    }
+
+    .empty-state {
+        padding: 40px;
+        color: rgba(255, 255, 255, 0.45);
+        font-size: 0.95rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .page-header h2 {
+        margin-bottom: 0;
+        font-size: 1.6rem;
+        letter-spacing: 1.5px;
+    }
+
+    .alert-glass-success {
+        background: rgba(25, 135, 84, 0.2);
+        border: 1px solid rgba(25, 135, 84, 0.45);
+        color: #a3ffcc;
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        backdrop-filter: blur(8px);
+    }
+
+    .alert-glass-warning {
+        background: rgba(255, 193, 7, 0.937);
+        border: 1px solid rgba(255, 193, 7, 0.4);
+        color: #ffe082;
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        backdrop-filter: blur(8px);
+    }
+
+    /* MOBILE CARDS */
+    .badge-cards { display: none; flex-direction: column; gap: 12px; }
+
+    .badge-card-item {
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: background 0.2s ease;
+    }
+
+    .badge-card-item:hover { background: rgba(235, 45, 93, 0.1); }
+
+    .badge-card-info { flex: 1; min-width: 0; }
+
+    .badge-card-info .badge-name {
+        font-weight: 600;
+        font-size: 0.97rem;
+        color: #fff;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .badge-card-info .badge-meta { font-size: 0.8rem; color: rgba(255,255,255,0.55); }
+
+    .badge-card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .table-view { display: none !important; }
+        .badge-cards { display: flex !important; }
+        .page-header h2 { font-size: 1.2rem; letter-spacing: 1px; }
+        .main-content { padding: 10px; }
+    }
+
+    @media (max-width: 991px) {
+        .sidebar {
+            position: fixed;
+            top: 120px;
+            left: 0;
+            width: 200px;
+            height: calc(100vh - 140px);
+            background: linear-gradient(145deg, #7917307b, rgba(106, 11, 36, 0.314));
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            transform: translateX(-200px);
+            transition: transform 0.35s ease;
+            border-radius: 0 14px 14px 0;
+            box-shadow: 6px 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: -10px;
+            width: 10px;
+            height: 100%;
+            background: linear-gradient(145deg, #79172f, rgba(106, 11, 36, 0.95));
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+        }
+
+        .sidebar:hover, .sidebar.open { transform: translateX(0); }
+
+        .sidebar-strip {
+            position: absolute;
+            top: 0;
+            right: -10px;
+            width: 10px;
+            height: 100%;
+            background: linear-gradient(145deg, #79172f, rgba(106, 11, 36, 0.95));
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+        }
+
+        .layout { flex-direction: column; }
+    }
+
+    /* ═══════════════════════════════
+       LOTTIE-STYLE CSS ANIMATIONS
+    ═══════════════════════════════ */
+
+    .anim-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 140px;
+        margin-bottom: 6px;
+    }
+
+    /* ── EDIT / PENCIL ── */
+    .anim-edit {
+        position: relative;
+        width: 130px;
+        height: 130px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pencil {
+        position: relative;
+        width: 14px;
+        height: 70px;
+        animation: pencilWrite 1.2s ease-in-out infinite;
+        transform-origin: bottom center;
+    }
+
+    .pencil-body {
+        width: 14px;
+        height: 52px;
+        background: linear-gradient(135deg, #f59e0b, #f97316);
+        border-radius: 3px 3px 0 0;
+    }
+
+    .pencil-tip {
+        width: 0;
+        height: 0;
+        border-left: 7px solid transparent;
+        border-right: 7px solid transparent;
+        border-top: 14px solid #f0d080;
+    }
+
+    .pencil-tip::after {
+        content: '';
+        display: block;
+        width: 0;
+        height: 0;
+        border-left: 3px solid transparent;
+        border-right: 3px solid transparent;
+        border-top: 6px solid #888;
+        margin: 0 auto;
+    }
+
+    .pencil-eraser {
+        position: absolute;
+        top: -6px;
+        left: 2px;
+        width: 10px;
+        height: 6px;
+        background: #ffaabb;
+        border-radius: 2px 2px 0 0;
+    }
+
+    @keyframes pencilWrite {
+        0%, 100% { transform: rotate(-28deg) translateX(-20px); }
+        25%       { transform: rotate(-6deg)  translateX(0px); }
+        50%       { transform: rotate(-28deg) translateX(-20px); }
+        75%       { transform: rotate(-6deg)  translateX(0px); }
+    }
+
+    .edit-lines {
+        position: absolute;
+        bottom: 20px;
+        left: 55%;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .edit-line {
+        height: 3px;
+        background: rgba(245,158,11,0.6);
+        border-radius: 2px;
+        animation: lineGrow 1.2s ease-in-out infinite;
+    }
+    .edit-line.l1 { width: 36px; animation-delay: 0s; }
+    .edit-line.l2 { width: 26px; animation-delay: 0.2s; }
+    .edit-line.l3 { width: 32px; animation-delay: 0.4s; }
+
+    @keyframes lineGrow {
+        0%, 100% { transform: scaleX(0.3); opacity: 0.3; transform-origin: left; }
+        50%       { transform: scaleX(1);   opacity: 1;   transform-origin: left; }
+    }
+
+    /* ── DELETE / TRASH ── */
+    .anim-delete {
+        position: relative;
+        width: 130px;
+        height: 130px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .trash-can { animation: trashShake 0.55s ease-in-out infinite; position: relative; }
+
+    .trash-lid {
+        width: 52px;
+        height: 10px;
+        background: #eb2d5d;
+        border-radius: 4px 4px 0 0;
+        margin: 0 auto 3px;
+        position: relative;
+        animation: lidBounce 0.55s ease-in-out infinite;
+        transform-origin: right center;
+    }
+
+    .trash-lid::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 16px;
+        height: 8px;
+        background: #eb2d5d;
+        border-radius: 3px 3px 0 0;
+    }
+
+    .trash-body {
+        width: 46px;
+        height: 52px;
+        background: linear-gradient(180deg, #c41f4a, #9d0033);
+        border-radius: 0 0 8px 8px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 8px 6px;
+    }
+
+    .trash-line {
+        width: 4px;
+        height: 30px;
+        background: rgba(255,255,255,0.35);
+        border-radius: 2px;
+        animation: trashLinePulse 0.55s ease-in-out infinite;
+    }
+    .trash-line:nth-child(2) { animation-delay: 0.1s; }
+    .trash-line:nth-child(3) { animation-delay: 0.2s; }
+
+    @keyframes trashShake {
+        0%, 100% { transform: rotate(0deg); }
+        20%       { transform: rotate(-7deg); }
+        40%       { transform: rotate(7deg); }
+        60%       { transform: rotate(-4deg); }
+        80%       { transform: rotate(4deg); }
+    }
+
+    @keyframes lidBounce {
+        0%, 60%, 100% { transform: rotate(0deg) translateY(0); }
+        30%            { transform: rotate(-20deg) translateY(-7px); }
+    }
+
+    @keyframes trashLinePulse {
+        0%, 100% { height: 30px; opacity: 1; }
+        50%       { height: 20px; opacity: 0.5; }
+    }
+
+    .delete-sparks { position: absolute; top: 28px; left: 50%; }
+
+    .spark {
+        position: absolute;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        animation: sparkFly 0.55s ease-out infinite;
+    }
+    .spark.s1 { background: #ff6b6b; left: -30px; top: 5px;  --tx: -14px; animation-delay: 0s; }
+    .spark.s2 { background: #f59e0b; left:  20px;  top: -5px; --tx:  14px; animation-delay: 0.18s; }
+    .spark.s3 { background: #eb2d5d; left: -5px;   top: -15px;--tx:  4px;  animation-delay: 0.09s; }
+
+    @keyframes sparkFly {
+        0%   { transform: translate(0,0) scale(1); opacity: 1; }
+        100% { transform: translate(var(--tx,0), -24px) scale(0); opacity: 0; }
+    }
+
+    /* ── SUCCESS / CHECKMARK ── */
+    .anim-success {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .success-ring {
+        position: absolute;
+        border-radius: 50%;
+        animation: ringPulse 1.4s ease-out infinite;
+    }
+    .success-ring.r1 { width: 100px; height: 100px; border: 3px solid rgba(40,167,69,0.45); animation-delay: 0s; }
+    .success-ring.r2 { width: 130px; height: 130px; border: 2px solid rgba(40,167,69,0.22); animation-delay: 0.35s; }
+
+    @keyframes ringPulse {
+        0%   { transform: scale(0.75); opacity: 0; }
+        40%  { opacity: 1; }
+        100% { transform: scale(1.1);  opacity: 0; }
+    }
+
+    .check-svg {
+        width: 80px;
+        height: 80px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .check-circle-stroke {
+        stroke: #28a745;
+        stroke-width: 2;
+        fill: none;
+        stroke-dasharray: 166;
+        stroke-dashoffset: 166;
+        animation: strokeDraw 0.8s ease forwards;
+    }
+
+    .check-mark-stroke {
+        stroke: #28a745;
+        stroke-width: 3.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+        stroke-dasharray: 48;
+        stroke-dashoffset: 48;
+        animation: strokeDraw 0.55s 0.6s ease forwards;
+    }
+
+    @keyframes strokeDraw { to { stroke-dashoffset: 0; } }
+
+    .confetti-wrap { position: absolute; width: 150px; height: 150px; top: 0; left: 0; }
+    .cdot {
+        position: absolute;
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        top: 50%; left: 50%;
+        animation: confettiBurst 1.3s ease-out infinite;
+    }
+    .cdot.d1 { background:#f59e0b; --ang:0deg;   animation-delay:0s; }
+    .cdot.d2 { background:#eb2d5d; --ang:45deg;  animation-delay:0.05s; }
+    .cdot.d3 { background:#3b82f6; --ang:90deg;  animation-delay:0.1s; }
+    .cdot.d4 { background:#8b5cf6; --ang:135deg; animation-delay:0.15s; }
+    .cdot.d5 { background:#28a745; --ang:180deg; animation-delay:0.2s; }
+    .cdot.d6 { background:#06b6d4; --ang:225deg; animation-delay:0.25s; }
+    .cdot.d7 { background:#f97316; --ang:270deg; animation-delay:0.3s; }
+    .cdot.d8 { background:#ec4899; --ang:315deg; animation-delay:0.35s; }
+
+    @keyframes confettiBurst {
+        0%   { transform:rotate(var(--ang)) translateY(0)    scale(1); opacity:1; }
+        55%  { transform:rotate(var(--ang)) translateY(-55px) scale(1.2); opacity:1; }
+        100% { transform:rotate(var(--ang)) translateY(-75px) scale(0); opacity:0; }
+    }
+
+    /* ──── FOOTER ──── */
+    .footer {
+        font-family: Poppins, sans-serif;
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(44, 31, 46, 0.95) 100%) !important;
+        border-top: 3px solid #F5A623;
+        box-shadow: 0 -2px 10px rgba(245, 166, 35, 0.3);
+        padding: 2rem 0;
+        margin-top: auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .footer::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+    }
+
+    .footer-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 3rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .footer-left { display: flex; align-items: center; flex-shrink: 0; }
+
+    .footer .xits-img {
+        width: 150px; height: 100px;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.1));
+        transition: transform 0.3s ease;
+    }
+
+    .footer .xits-img:hover { transform: scale(1.05); }
+
+    .footer-right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        text-align: end;
+    }
+
+    .footer p {
+        color: #64748B;
+        font-size: 0.95rem;
+        font-family: 'Inter', 'Poppins', sans-serif;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .footer-links {
+        display: flex;
+        align-items: end;
+        text-align: end;
+        justify-content: flex-end;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .footer-links a {
+        color: #94A3B8;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        position: relative;
+        white-space: nowrap;
+    }
+
+    .footer-links a:hover { color: #F5A623; transform: translateY(-2px); }
+
+    .footer-links a::after {
+        content: '';
+        position: absolute;
+        width: 0; height: 2px;
+        bottom: -4px; left: 0;
+        background-color: #F5A623;
+        transition: width 0.3s ease;
+    }
+
+    .footer-links a:hover::after { width: 100%; }
+    .copyright { color: #64748B; font-size: 0.85rem; margin-top: 0.5rem; }
+
+    @media (max-width: 992px) {
+        .footer { padding: 1.75rem 0; }
+        .footer-container { gap: 2rem; }
+        .footer .xits-img { width: 85px; height: 70px; }
+        .footer p { font-size: 0.9rem; }
+        .footer-links { gap: 1.5rem; }
+        .footer-links a { font-size: 0.85rem; }
+    }
+
+    @media (max-width: 768px) {
+        .footer { padding: 1.5rem 0; }
+        .footer-container { flex-direction: column; gap: 1.5rem; text-align: center; }
+        .footer-left { justify-content: center; }
+        .footer .xits-img { width: 75px; height: 62px; }
+        .footer-right { align-items: center; }
+        .footer-links { justify-content: center; gap: 1.5rem; }
+        .footer p { font-size: 0.88rem; }
+    }
+
+    @media (max-width: 576px) {
+        .footer { padding: 1.25rem 0; }
+        .footer-container { gap: 1rem; }
+        .footer .xits-img { width: 65px; height: 54px; }
+        .footer-links { gap: 1rem; }
+        .footer-links a { font-size: 0.8rem; }
+        .footer p { font-size: 0.82rem; }
+        .copyright { font-size: 0.78rem; }
+    }
+
+    /* SweetAlert custom */
+    .swal2-popup {
+        background: linear-gradient(145deg, rgba(255,255,255,0.97), rgba(250,240,245,0.97)) !important;
+        border-radius: 24px !important;
+        border: 2px solid rgba(235,45,93,0.35) !important;
+        box-shadow: 0 24px 70px rgba(235,45,93,0.28) !important;
+        font-family: 'Poppins', sans-serif !important;
+        padding: 32px !important;
+    }
+    .swal2-title { color: #7d0122 !important; font-weight: 800 !important; font-size: 1.45rem !important; }
+    .swal2-html-container { color: #444 !important; font-size: 0.92rem !important; }
+    .swal2-confirm {
+        background: linear-gradient(135deg, #eb2d5d, #c41f4a) !important;
+        border: none !important;
+        border-radius: 30px !important;
+        padding: 11px 28px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .swal2-cancel {
+        background: linear-gradient(135deg, #6c757d, #5a6268) !important;
+        border: none !important;
+        border-radius: 30px !important;
+        padding: 11px 28px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .swal2-actions { gap: 12px !important; margin-top: 18px !important; }
+</style>
+
+<body>
+<!-- NAVBAR -->
+<div th:replace="~{fragments/navbar :: nav(activePage='dashboard')}"></div>
+
+<!-- LAYOUT -->
+<div class="container-fluid">
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="sidebar mb-3">
+            <div class="text-center mb-4" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <a th:href="@{/profile}">
+                    <img th:src="${photo != null} ? 'data:image/jpeg;base64,' + ${photo} : @{/images/default.png}"
+                         alt="Profile Picture" width="50" height="50" class="rounded-circle" />
+                </a>
+                <h6 style="font-family: 'Poppins', sans-serif; color: #ffffff; margin-top: 0;" th:text="${username}">Admin</h6>
+            </div>
+            <nav>
+                <a th:href="@{/dashboard}" th:classappend="${activePage == 'dashboard'} ? 'active' : ''">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <a th:href="@{/moviedelete}" th:classappend="${activePage == 'moviedelete'} ? 'active' : ''">
+                    <i class="bi bi-camera-reels-fill"></i> All Movies
+                </a>
+                <a th:href="@{/showpeople}" th:classappend="${activePage == 'showpeople'} ? 'active' : ''">
+                    <i class="bi bi-people-fill"></i> All Crew
+                </a>
+                <a th:href="@{/users}" th:classappend="${activePage == 'makeAdmin'} ? 'active' : ''">
+                    <i class="bi bi-person-workspace"></i> All Users
+                </a>
+                <a th:href="@{/ShowReports}" th:classappend="${activePage == 'ShowReports'} ? 'active' : ''">
+                    <i class="bi bi-bar-chart-fill"></i> All Reports
+                </a>
+                <a class="active" th:href="@{/list}" th:classappend="${activePage == 'badgelist'} ? 'active' : ''">
+                    <i class="bi bi-award-fill"></i> Badges
+                </a>
+                <a th:href="@{/logout}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </nav>
+            <div class="sidebar-strip"></div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content mt-4">
+
+            <div class="page-header">
+                <h2><i class="bi bi-award-fill text-warning"></i> Badge Management</h2>
+                <a href="/addbages" class="btn-glass-primary">
+                    <i class="bi bi-plus-circle"></i> Add Badge
+                </a>
+            </div>
+
+            <div th:if="${success}" class="alert-glass-success alert-dismissible fade show d-flex justify-content-between align-items-center">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${warning}" class="alert-glass-warning alert-dismissible fade show d-flex justify-content-between align-items-center">
+                <span th:text="${warning}"></span>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- DESKTOP TABLE -->
+            <div class="glass-card table-view">
+                <div class="table-responsive">
+                    <table class="glass-table">
+                        <thead>
+                        <tr>
+                            <th style="width:80px;">Icon</th>
+                            <th>Badge Name</th>
+                            <th>Category</th>
+                            <th>Required Reviews</th>
+                            <th style="width:130px;">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="badge : ${badges}">
+                            <td>
+                                <img th:if="${badge.icon != null}"
+                                     th:src="@{/icon/{id}(id=${badge.badgeId})}"
+                                     class="badge-icon" width="45" height="45" alt="Badge Icon"/>
+                                <span th:if="${badge.icon == null}" style="color:rgba(255,255,255,0.35);font-size:0.8rem;">No Icon</span>
+                            </td>
+                            <td class="fw-semibold" th:text="${badge.name}"></td>
+                            <td th:text="${badge.category.name}" style="color:rgba(255,255,255,0.75);"></td>
+                            <td><span class="reviews-badge" th:text="${badge.requiredReviews}"></span></td>
+                            <td>
+                                <div style="display:flex;justify-content:center;gap:6px;">
+                                    <button type="button" class="btn-glass-warning"
+                                            th:attr="data-url=@{/updatebadge/{id}(id=${badge.badgeId})},data-name=${badge.name}"
+                                            onclick="confirmEdit(this)">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button type="button" class="btn-glass-danger"
+                                            th:attr="data-url=@{/deletebadge/{id}(id=${badge.badgeId})},data-name=${badge.name}"
+                                            onclick="confirmDelete(this)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    <form th:id="'deleteForm-' + ${badge.badgeId}"
+                                          th:action="@{/deletebadge/{id}(id=${badge.badgeId})}"
+                                          method="post" style="display:none;"></form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(badges)}">
+                            <td colspan="5">
+                                <div class="empty-state text-center">
+                                    <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                                    No badges created yet.
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MOBILE CARDS -->
+            <div class="badge-cards">
+                <div th:if="${#lists.isEmpty(badges)}" class="glass-card text-center empty-state">
+                    <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                    No badges created yet.
+                </div>
+
+                <div th:each="badge : ${badges}" class="badge-card-item">
+                    <div style="flex-shrink:0;">
+                        <img th:if="${badge.icon != null}"
+                             th:src="@{/icon/{id}(id=${badge.badgeId})}"
+                             class="badge-icon" width="48" height="48" alt="Badge Icon"/>
+                        <div th:if="${badge.icon == null}"
+                             style="width:48px;height:48px;border-radius:10px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:rgba(255,255,255,0.35);">
+                            No Icon
+                        </div>
+                    </div>
+                    <div class="badge-card-info">
+                        <div class="badge-name" th:text="${badge.name}"></div>
+                        <div class="badge-meta">
+                            <span th:text="${badge.category.name}"></span> &nbsp;·&nbsp;
+                            <span class="reviews-badge" th:text="${badge.requiredReviews} + ' reviews'"></span>
+                        </div>
+                    </div>
+                    <div class="badge-card-actions">
+                        <button type="button" class="btn-glass-warning"
+                                th:attr="data-url=@{/updatebadge/{id}(id=${badge.badgeId})},data-name=${badge.name}"
+                                onclick="confirmEdit(this)">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button type="button" class="btn-glass-danger"
+                                th:attr="data-url=@{/deletebadge/{id}(id=${badge.badgeId})},data-name=${badge.name}"
+                                onclick="confirmDelete(this)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        <form th:id="'deleteFormMob-' + ${badge.badgeId}"
+                              th:action="@{/deletebadge/{id}(id=${badge.badgeId})}"
+                              method="post" style="display:none;"></form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container-fluid px-3 px-md-4">
+        <div class="footer-container">
+            <div class="footer-left">
+                <img th:src="@{/photos/XITS.png}"
+                     class="xits-img" alt="xits" style="cursor:pointer;"
+                     onclick="window.open('https://www.xansa.net/', '_blank')">
+            </div>
+            <div class="footer-right">
+                <p>Your ultimate destination for movie ratings and reviews</p>
+                <div class="footer-links">
+                    <a th:href="@{/about}">About</a>
+                    <a th:href="@{/privacy}">Privacy</a>
+                    <a th:href="@{/terms}">Terms</a>
+                    <a th:href="@{/contact}">Contact</a>
+                </div>
+                <p class="copyright">© 2025 Kaisi Lagi. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    /* ─── ANIMATION HTML SNIPPETS ─── */
+
+    const EDIT_ANIM = `
+<div class="anim-container">
+  <div class="anim-edit">
+    <div class="pencil">
+      <div class="pencil-eraser"></div>
+      <div class="pencil-body"></div>
+      <div class="pencil-tip"></div>
+    </div>
+    <div class="edit-lines">
+      <div class="edit-line l1"></div>
+      <div class="edit-line l2"></div>
+      <div class="edit-line l3"></div>
+    </div>
+  </div>
+</div>`;
+
+    const DELETE_ANIM = `
+<div class="anim-container">
+  <div class="anim-delete">
+    <div class="trash-can">
+      <div class="trash-lid"></div>
+      <div class="trash-body">
+        <div class="trash-line"></div>
+        <div class="trash-line"></div>
+        <div class="trash-line"></div>
+      </div>
+    </div>
+    <div class="delete-sparks">
+      <div class="spark s1"></div>
+      <div class="spark s2"></div>
+      <div class="spark s3"></div>
+    </div>
+  </div>
+</div>`;
+
+    const SUCCESS_ANIM = `
+<div class="anim-container">
+  <div class="anim-success">
+    <div class="success-ring r1"></div>
+    <div class="success-ring r2"></div>
+    <svg class="check-svg" viewBox="0 0 52 52">
+      <circle class="check-circle-stroke" cx="26" cy="26" r="25"/>
+      <path class="check-mark-stroke" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+    </svg>
+    <div class="confetti-wrap">
+      <div class="cdot d1"></div><div class="cdot d2"></div>
+      <div class="cdot d3"></div><div class="cdot d4"></div>
+      <div class="cdot d5"></div><div class="cdot d6"></div>
+      <div class="cdot d7"></div><div class="cdot d8"></div>
+    </div>
+  </div>
+</div>`;
+
+    /* ─── EDIT CONFIRMATION ─── */
+    function confirmEdit(btn) {
+        const url  = btn.getAttribute('data-url');
+        const name = btn.getAttribute('data-name');
+
+        Swal.fire({
+            title: 'Edit Badge?',
+            html: `
+            ${EDIT_ANIM}
+            <p style="color:#555;margin-top:4px;">Edit <strong>${name}</strong>?</p>
+        `,
+            showCancelButton: true,
+            confirmButtonText: '<i class="bi bi-pencil-square"></i> Yes, Edit',
+            cancelButtonText:  '<i class="bi bi-x-circle"></i> Cancel',
+            reverseButtons: true,
+            allowOutsideClick: false
+        }).then(result => {
+            if (result.isConfirmed) window.location.href = url;
+        });
+    }
+
+    /* ─── DELETE CONFIRMATION ─── */
+    function confirmDelete(btn) {
+        const url  = btn.getAttribute('data-url');
+        const name = btn.getAttribute('data-name');
+
+        Swal.fire({
+            title: 'Delete Badge?',
+            html: `
+            ${DELETE_ANIM}
+            <p style="color:#555;margin-top:4px;">Permanently delete <strong>${name}</strong>?</p>
+            <p style="color:#eb2d5d;font-weight:700;font-size:0.85rem;margin-top:8px;">
+                <i class="bi bi-exclamation-triangle-fill"></i> This cannot be undone!
+            </p>
+        `,
+            showCancelButton: true,
+            confirmButtonText: '<i class="bi bi-trash-fill"></i> Yes, Delete',
+            cancelButtonText:  '<i class="bi bi-x-circle"></i> Cancel',
+            reverseButtons: true,
+            allowOutsideClick: false
+        }).then(result => {
+            if (!result.isConfirmed) return;
+
+            fetch(url, { method: 'POST' })
+                .then(() => {
+                Swal.fire({
+                    title: 'Deleted!',
+                    html: `
+                        ${SUCCESS_ANIM}
+                        <p style="color:#28a745;font-weight:600;margin-top:6px;">Badge deleted successfully!</p>
+                    `,
+                    showConfirmButton: false,
+                    timer: 2200,
+                    allowOutsideClick: false
+                }).then(() => location.reload());
+            })
+                .catch(() => {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Could not delete badge. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        });
+    }
+
+    /* Sidebar hover overlay */
+    const sidebar = document.getElementById('sidebar');
+    sidebar.addEventListener('mouseenter', () => { if (window.innerWidth <= 991) sidebar.classList.add('open'); });
+    sidebar.addEventListener('mouseleave', () => { if (window.innerWidth <= 991) sidebar.classList.remove('open'); });
+</script>
+
+</body>
+</html>
