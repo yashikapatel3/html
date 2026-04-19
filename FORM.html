@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sky Furniture & Interior — Crafting Comfort, Creating Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brown:      #7B3F1A;
+      --brown-deep: #5A2D0C;
+      --brown-mid:  #A0522D;
+      --caramel:    #C8864A;
+      --sand:       #E8D5B7;
+      --cream:      #F5EDE0;
+      --warm-white: #FBF7F2;
+      --charcoal:   #2C2420;
+      --text-body:  #4A3728;
+      --text-mid:   #8A6A54;
+      --text-light: #B89880;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--warm-white);
+      color: var(--text-body);
+      overflow-x: hidden;
+    }
+
+    /* ═══════ SCROLLBAR ═══════ */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--cream); }
+    ::-webkit-scrollbar-thumb { background: var(--caramel); border-radius: 4px; }
+
+    /* ═══════ CURSOR ═══════ */
+    body { cursor: none; }
+    #cursor {
+      width: 10px; height: 10px;
+      background: var(--brown);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: transform .15s ease, width .3s ease, height .3s ease, background .3s;
+    }
+    #cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(123,63,26,0.4);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: transform .35s cubic-bezier(.23,1,.32,1), width .3s, height .3s, border-color .3s;
+    }
+    body:hover #cursor { background: var(--brown); }
+    a:hover ~ #cursor, button:hover ~ #cursor { width: 16px; height: 16px; }
+
+    /* ═══════ NAVBAR ═══════ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 500;
+      padding: 0 3rem;
+      height: 70px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background .4s ease, box-shadow .4s;
+    }
+    nav.scrolled {
+      background: rgba(251,247,242,0.95);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 2px 24px rgba(123,63,26,0.08);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 38px; height: 38px;
+      position: relative;
+    }
+    .nav-logo-icon svg { width: 100%; height: 100%; }
+    .nav-logo-text { line-height: 1.1; }
+    .nav-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--brown);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .nav-tagline {
+      font-size: 0.58rem;
+      letter-spacing: 2.5px;
+      color: var(--text-light);
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      color: var(--text-body);
+      text-decoration: none;
+      text-transform: uppercase;
+      position: relative;
+      padding-bottom: 4px;
+      transition: color .25s;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0;
+      width: 0; height: 1.5px;
+      background: var(--caramel);
+      transition: width .3s ease;
+    }
+    .nav-links a:hover { color: var(--brown); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      background: var(--brown);
+      color: var(--cream) !important;
+      padding: 9px 22px !important;
+      border-radius: 2px !important;
+      letter-spacing: 1.5px !important;
+      transition: background .25s !important;
+    }
+    .nav-cta::after { display: none !important; }
+    .nav-cta:hover { background: var(--brown-deep) !important; color: var(--cream) !important; }
+    .nav-hamburger {
+      display: none;
+      flex-direction: column; gap: 5px;
+      cursor: pointer; background: none; border: none; padding: 4px;
+    }
+    .ham-line { width: 24px; height: 1.5px; background: var(--brown); border-radius: 2px; transition: all .3s; }
+    .mobile-menu {
+      display: none;
+      position: fixed; top: 70px; left: 0; right: 0;
+      background: rgba(251,247,242,0.98);
+      backdrop-filter: blur(20px);
+      padding: 20px 2rem 28px;
+      border-bottom: 1px solid var(--sand);
+      z-index: 499;
+      flex-direction: column; gap: 16px;
+    }
+    .mobile-menu.open { display: flex; animation: slideDown .3s ease; }
+    @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+    .mobile-menu a { font-size: 0.9rem; font-weight: 500; color: var(--text-body); text-decoration: none; letter-spacing: 1px; text-transform: uppercase; padding: 8px 0; border-bottom: 1px solid var(--sand); }
+    .mobile-menu a:last-child { border-bottom: none; }
+
+    /* ═══════ HERO ═══════ */
+    .hero {
+      min-height: 100vh;
+      position: relative;
+      display: flex; align-items: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(135deg, rgba(251,247,242,0.97) 0%, rgba(232,213,183,0.85) 50%, rgba(200,134,74,0.25) 100%);
+      z-index: 1;
+    }
+    /* Geometric decorative shapes */
+    .hero-shape-1 {
+      position: absolute; top: 0; right: 0;
+      width: 55vw; height: 100vh;
+      background: linear-gradient(135deg, var(--sand) 0%, var(--caramel) 100%);
+      clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%);
+      opacity: 0.22;
+      z-index: 0;
+    }
+    .hero-shape-2 {
+      position: absolute; bottom: -60px; left: 10%;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,134,74,0.15), transparent 70%);
+      z-index: 0;
+    }
+    .hero-deco-circle {
+      position: absolute; top: 15%; right: 8%;
+      width: 420px; height: 420px;
+      border-radius: 50%;
+      border: 1px solid rgba(123,63,26,0.12);
+      z-index: 0;
+    }
+    .hero-deco-circle::before {
+      content: '';
+      position: absolute; inset: 20px;
+      border-radius: 50%;
+      border: 1px solid rgba(123,63,26,0.08);
+    }
+    .hero-room-img {
+      position: absolute; top: 0; right: 0;
+      width: 55%; height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      opacity: 0.18;
+    }
+    /* Simulated room scene using CSS */
+    .hero-room-art {
+      position: absolute; top: 8%; right: 2%;
+      width: 46%; height: 85%;
+      z-index: 1;
+      border-radius: 4px 4px 60% 4px;
+      overflow: hidden;
+    }
+    .room-art-inner {
+      width: 100%; height: 100%;
+      background: linear-gradient(160deg, #E8D0B0 0%, #D4B896 40%, #C4A07A 100%);
+      position: relative;
+      display: flex; align-items: flex-end; justify-content: center;
+    }
+    /* Sofa SVG silhouette */
+    .room-art-overlay {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 100%, rgba(200,134,74,0.3) 0%, transparent 60%),
+        linear-gradient(0deg, rgba(90,45,12,0.15) 0%, transparent 50%);
+    }
+    .room-furniture {
+      position: absolute;
+      bottom: 10%;
+      width: 80%;
+      display: flex; gap: 12px; align-items: flex-end; justify-content: center;
+    }
+
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 120px 3rem 80px;
+      max-width: 600px;
+    }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--caramel);
+      margin-bottom: 20px;
+      animation: fadeUp .7s .1s ease both;
+    }
+    .eyebrow-line { width: 40px; height: 1px; background: var(--caramel); }
+    .hero-headline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 300;
+      color: var(--charcoal);
+      line-height: 1.05;
+      margin-bottom: 10px;
+      animation: fadeUp .7s .2s ease both;
+    }
+    .hero-headline em { color: var(--brown); font-style: italic; font-weight: 600; }
+    .hero-headline strong { font-weight: 700; display: block; }
+    .hero-sub-line {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      color: var(--text-mid);
+      font-style: italic;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+      animation: fadeUp .7s .3s ease both;
+    }
+    .hero-desc {
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: var(--text-mid);
+      max-width: 440px;
+      margin-bottom: 36px;
+      animation: fadeUp .7s .4s ease both;
+    }
+    .hero-actions {
+      display: flex; align-items: center; gap: 16px;
+      flex-wrap: wrap;
+      animation: fadeUp .7s .5s ease both;
+    }
+    .btn-primary {
+      background: var(--brown);
+      color: var(--cream);
+      padding: 14px 34px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: all .3s;
+      display: inline-block;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left .5s;
+    }
+    .btn-primary:hover { background: var(--brown-deep); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(123,63,26,0.3); }
+    .btn-primary:hover::before { left: 100%; }
+    .btn-outline-hero {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--brown); text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: gap .3s;
+    }
+    .btn-outline-hero svg { width: 36px; height: 36px; transition: transform .3s; }
+    .btn-outline-hero:hover { gap: 14px; }
+    .btn-outline-hero:hover svg { transform: rotate(90deg); }
+
+    .hero-stats {
+      position: absolute; bottom: 40px; left: 3rem;
+      z-index: 2;
+      display: flex; gap: 40px;
+      animation: fadeUp .7s .7s ease both;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 600; color: var(--brown);
+      line-height: 1;
+    }
+    .hero-stat-label { font-size: 0.68rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-light); margin-top: 4px; }
+    .hero-stat-divider { width: 1px; background: var(--sand); align-self: stretch; }
+
+    /* Floating badge */
+    .hero-badge {
+      position: absolute; right: 5%; top: 18%;
+      z-index: 3;
+      width: 110px; height: 110px;
+      background: var(--brown);
+      border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      animation: rotateBadge 20s linear infinite, fadeUp .7s .6s ease both;
+      box-shadow: 0 12px 36px rgba(123,63,26,0.35);
+    }
+    @keyframes rotateBadge {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .badge-text {
+      font-size: 0.55rem; letter-spacing: 3px; text-transform: uppercase; color: var(--sand);
+      animation: rotateBadge 20s linear infinite reverse;
+      display: block;
+    }
+    .badge-num { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; color: var(--cream); animation: rotateBadge 20s linear infinite reverse; }
+
+    /* ═══════ MARQUEE STRIP ═══════ */
+    .marquee-strip {
+      background: var(--brown);
+      padding: 12px 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .marquee-inner {
+      display: flex; white-space: nowrap;
+      animation: marqueeScroll 25s linear infinite;
+    }
+    .marquee-item {
+      display: inline-flex; align-items: center; gap: 16px;
+      padding: 0 30px;
+      font-size: 0.72rem; font-weight: 500; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--sand);
+    }
+    .marquee-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--caramel); flex-shrink: 0; }
+    @keyframes marqueeScroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ═══════ SECTION BASE ═══════ */
+    section { padding: 90px 3rem; }
+    .section-eyebrow {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase; color: var(--caramel);
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 300; color: var(--charcoal); line-height: 1.15;
+      margin-bottom: 14px;
+    }
+    .section-title em { color: var(--brown); font-style: italic; }
+    .section-desc { font-size: 0.9rem; line-height: 1.8; color: var(--text-mid); max-width: 520px; }
+
+    /* ═══════ ABOUT STRIP ═══════ */
+    .about-strip {
+      background: var(--cream);
+      border-top: 1px solid var(--sand); border-bottom: 1px solid var(--sand);
+    }
+    .about-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .about-visual {
+      position: relative;
+      height: 460px;
+    }
+    .about-img-main {
+      position: absolute; bottom: 0; left: 0;
+      width: 75%; height: 85%;
+      background: linear-gradient(135deg, #D4B896 0%, #C8864A 100%);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem;
+      overflow: hidden;
+    }
+    .about-img-main::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(90,45,12,0.2), transparent);
+    }
+    .about-img-accent {
+      position: absolute; top: 0; right: 0;
+      width: 50%; height: 55%;
+      background: linear-gradient(135deg, var(--brown) 0%, var(--brown-deep) 100%);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem;
+    }
+    .about-tag {
+      position: absolute; bottom: 20px; right: 10px;
+      background: var(--warm-white);
+      border: 1px solid var(--sand);
+      border-radius: 4px;
+      padding: 12px 16px;
+      font-size: 0.75rem;
+    }
+    .about-tag strong { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--brown); display: block; }
+    .about-tag span { color: var(--text-mid); font-size: 0.68rem; letter-spacing: 0.5px; }
+    .about-years-badge {
+      position: absolute; top: 10%; left: 5%;
+      width: 80px; height: 80px;
+      background: var(--caramel);
+      border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: 0 8px 24px rgba(200,134,74,0.4);
+    }
+    .ayb-num { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; color: white; line-height: 1; }
+    .ayb-txt { font-size: 0.52rem; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.8); }
+
+    .about-text .section-desc { margin-bottom: 28px; }
+    .about-features { display: flex; flex-direction: column; gap: 14px; margin-bottom: 32px; }
+    .about-feat {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--sand);
+      border-radius: 4px;
+      background: var(--warm-white);
+      transition: border-color .25s, transform .25s;
+    }
+    .about-feat:hover { border-color: var(--caramel); transform: translateX(4px); }
+    .feat-icon {
+      width: 36px; height: 36px;
+      background: rgba(200,134,74,0.12);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+    .feat-title { font-size: 0.85rem; font-weight: 600; color: var(--charcoal); margin-bottom: 2px; }
+    .feat-desc { font-size: 0.75rem; color: var(--text-mid); line-height: 1.5; }
+
+    /* ═══════ PRODUCTS ═══════ */
+    .products { background: var(--warm-white); }
+    .products-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 48px; flex-wrap: wrap; gap: 20px;
+      max-width: 1200px; margin-left: auto; margin-right: auto;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .product-card {
+      background: var(--cream);
+      border: 1px solid var(--sand);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: all .3s cubic-bezier(.25,.46,.45,.94);
+      cursor: pointer;
+      position: relative;
+      group: true;
+    }
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 48px rgba(123,63,26,0.15);
+      border-color: var(--caramel);
+    }
+    .product-card:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+    .product-card:nth-child(4) { grid-column: span 2; }
+    .product-thumb {
+      height: 160px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .product-card:nth-child(1) .product-thumb { height: 260px; }
+    .product-thumb-bg {
+      position: absolute; inset: 0;
+      transition: transform .4s ease;
+    }
+    .product-card:hover .product-thumb-bg { transform: scale(1.05); }
+    .product-emoji { position: relative; z-index: 1; font-size: 2.5rem; }
+    .product-card:nth-child(1) .product-emoji { font-size: 4rem; }
+    .product-info { padding: 14px 16px; }
+    .product-cat { font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--caramel); margin-bottom: 4px; }
+    .product-name { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 600; color: var(--charcoal); }
+    .product-card:nth-child(1) .product-name { font-size: 1.4rem; }
+    .product-arrow {
+      position: absolute; top: 14px; right: 14px;
+      width: 30px; height: 30px;
+      background: rgba(251,247,242,0.9);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: all .25s;
+    }
+    .product-card:hover .product-arrow { opacity: 1; transform: translateY(0); }
+
+    /* bg colors per card */
+    .pb-1 { background: linear-gradient(135deg, #E8D0B0, #D4B896); }
+    .pb-2 { background: linear-gradient(135deg, #D4B896, #C4A07A); }
+    .pb-3 { background: linear-gradient(135deg, #C4A07A, #B07050); }
+    .pb-4 { background: linear-gradient(135deg, #B07050, #9A5C38); }
+    .pb-5 { background: linear-gradient(135deg, #9A5C38, #7B3F1A); }
+    .pb-6 { background: linear-gradient(135deg, #E0C8A0, #D0B080); }
+    .pb-7 { background: linear-gradient(135deg, #C8A876, #B8905A); }
+
+    /* ═══════ SELL LIST ═══════ */
+    .sell-section { background: var(--brown); overflow: hidden; position: relative; }
+    .sell-section::before {
+      content: '';
+      position: absolute; top: -100px; right: -100px;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.03);
+    }
+    .sell-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+      position: relative; z-index: 1;
+    }
+    .sell-text .section-eyebrow { color: var(--caramel); }
+    .sell-text .section-title { color: var(--cream); }
+    .sell-text .section-title em { color: var(--caramel); }
+    .sell-text .section-desc { color: rgba(232,213,183,0.7); }
+    .sell-list {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-top: 32px;
+    }
+    .sell-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(200,134,74,0.2);
+      border-radius: 4px;
+      transition: all .25s;
+      cursor: pointer;
+    }
+    .sell-item:hover { background: rgba(200,134,74,0.15); border-color: rgba(200,134,74,0.4); transform: translateX(4px); }
+    .sell-item-icon { font-size: 1.2rem; width: 36px; text-align: center; flex-shrink: 0; }
+    .sell-item-name { font-size: 0.85rem; font-weight: 500; color: var(--sand); letter-spacing: 0.3px; }
+    .sell-visual {
+      position: relative; height: 480px;
+    }
+    .sell-card-main {
+      position: absolute; top: 0; left: 0;
+      width: 80%; height: 75%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(200,134,74,0.25);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem;
+      backdrop-filter: blur(4px);
+    }
+    .sell-card-accent {
+      position: absolute; bottom: 0; right: 0;
+      width: 55%; height: 48%;
+      background: var(--caramel);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem;
+    }
+    .sell-badge {
+      position: absolute; top: 50%; left: 70%;
+      transform: translate(-50%, -50%);
+      width: 90px; height: 90px;
+      background: var(--cream);
+      border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--brown);
+      font-size: 0.7rem; font-weight: 600; text-align: center; line-height: 1.3;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+      z-index: 2;
+    }
+    .sell-badge strong { font-size: 1.3rem; display: block; }
+
+    /* ═══════ WHY US ═══════ */
+    .why-section { background: var(--cream); }
+    .why-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 20px; margin-top: 48px;
+      max-width: 1200px; margin-left: auto; margin-right: auto;
+    }
+    .why-card {
+      padding: 28px 22px;
+      background: var(--warm-white);
+      border: 1px solid var(--sand);
+      border-radius: 4px;
+      text-align: center;
+      transition: all .3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .why-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--caramel), var(--brown));
+      transform: scaleX(0);
+      transition: transform .3s;
+    }
+    .why-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(123,63,26,0.12); }
+    .why-card:hover::after { transform: scaleX(1); }
+    .why-icon {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: rgba(200,134,74,0.12);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 1.5rem;
+      transition: background .3s;
+    }
+    .why-card:hover .why-icon { background: rgba(200,134,74,0.22); }
+    .why-num {
+      position: absolute; top: 14px; right: 16px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem; font-weight: 300;
+      color: rgba(200,134,74,0.12);
+      line-height: 1;
+    }
+    .why-title { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 600; color: var(--charcoal); margin-bottom: 8px; }
+    .why-desc { font-size: 0.78rem; color: var(--text-mid); line-height: 1.7; }
+
+    /* ═══════ CTA BANNER ═══════ */
+    .cta-banner {
+      margin: 0 3rem;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--charcoal) 0%, var(--brown-deep) 60%, var(--brown-mid) 100%);
+      padding: 60px 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 30px; flex-wrap: wrap;
+      position: relative; overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 260px; height: 260px;
+      border-radius: 50%;
+      background: rgba(200,134,74,0.15);
+    }
+    .cta-banner::after {
+      content: '';
+      position: absolute; bottom: -40px; left: 30%;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: rgba(200,134,74,0.08);
+    }
+    .cta-text { position: relative; z-index: 1; }
+    .cta-eyebrow { font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase; color: var(--caramel); margin-bottom: 10px; }
+    .cta-title { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 300; color: var(--cream); line-height: 1.2; }
+    .cta-title em { color: var(--caramel); font-style: italic; }
+    .cta-sub { font-size: 0.85rem; color: rgba(232,213,183,0.6); margin-top: 8px; }
+    .cta-actions { display: flex; gap: 14px; flex-wrap: wrap; position: relative; z-index: 1; }
+    .btn-cta-light {
+      background: var(--cream);
+      color: var(--brown);
+      padding: 13px 30px;
+      border-radius: 2px;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+      text-decoration: none;
+      transition: all .25s;
+    }
+    .btn-cta-light:hover { background: white; transform: translateY(-2px); }
+    .btn-cta-outline {
+      background: transparent;
+      border: 1px solid rgba(232,213,183,0.4);
+      color: var(--sand);
+      padding: 13px 30px;
+      border-radius: 2px;
+      font-size: 0.8rem; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase;
+      text-decoration: none;
+      transition: all .25s;
+    }
+    .btn-cta-outline:hover { border-color: var(--caramel); color: var(--caramel); }
+
+    /* ═══════ CONTACT ═══════ */
+    .contact { background: var(--warm-white); }
+    .contact-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: start;
+    }
+    .contact-info { display: flex; flex-direction: column; gap: 20px; margin-top: 28px; }
+    .contact-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 18px 20px;
+      background: var(--cream);
+      border: 1px solid var(--sand);
+      border-radius: 4px;
+      transition: border-color .25s;
+    }
+    .contact-item:hover { border-color: var(--caramel); }
+    .contact-icon {
+      width: 42px; height: 42px;
+      background: rgba(200,134,74,0.12);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .ci-label { font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--caramel); margin-bottom: 4px; font-weight: 600; }
+    .ci-value { font-size: 0.9rem; font-weight: 500; color: var(--charcoal); }
+    .ci-sub { font-size: 0.75rem; color: var(--text-mid); margin-top: 2px; }
+
+    /* Contact Form */
+    .contact-form-wrap { background: var(--cream); border: 1px solid var(--sand); border-radius: 4px; padding: 32px; }
+    .cf-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; color: var(--charcoal); margin-bottom: 4px; }
+    .cf-sub { font-size: 0.8rem; color: var(--text-mid); margin-bottom: 24px; }
+    .cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .cf-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .cf-field label { font-size: 0.68rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-mid); }
+    .cf-field input, .cf-field textarea, .cf-field select {
+      padding: 11px 14px;
+      border: 1px solid var(--sand);
+      border-radius: 2px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.88rem; color: var(--charcoal);
+      background: var(--warm-white);
+      outline: none;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .cf-field input:focus, .cf-field textarea:focus, .cf-field select:focus {
+      border-color: var(--caramel);
+      box-shadow: 0 0 0 3px rgba(200,134,74,0.10);
+    }
+    .cf-field textarea { resize: vertical; min-height: 100px; }
+
+    /* ═══════ FOOTER ═══════ */
+    footer {
+      background: var(--charcoal);
+      color: var(--sand);
+      padding: 60px 3rem 28px;
+    }
+    .footer-top {
+      display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 40px; margin-bottom: 48px;
+    }
+    .footer-brand-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 700; color: var(--cream);
+      letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px;
+    }
+    .footer-brand-tag { font-size: 0.65rem; letter-spacing: 2px; color: var(--caramel); text-transform: uppercase; margin-bottom: 14px; }
+    .footer-brand-desc { font-size: 0.8rem; line-height: 1.8; color: rgba(186,152,128,0.7); margin-bottom: 20px; }
+    .footer-social { display: flex; gap: 10px; }
+    .footer-social a {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(200,134,74,0.3);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; text-decoration: none; color: var(--stone);
+      transition: all .25s;
+    }
+    .footer-social a:hover { background: var(--caramel); border-color: var(--caramel); color: white; }
+    .footer-col-title { font-size: 0.7rem; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--caramel); margin-bottom: 18px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { font-size: 0.82rem; color: rgba(186,152,128,0.7); text-decoration: none; transition: color .25s; }
+    .footer-links a:hover { color: var(--sand); }
+    .footer-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 24px;
+      border-top: 1px solid rgba(200,134,74,0.15);
+      font-size: 0.75rem; color: rgba(186,152,128,0.5);
+      flex-wrap: wrap; gap: 12px;
+    }
+
+    /* ═══════ REVEAL ANIMATION ═══════ */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ═══════ ANIMATIONS ═══════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    /* ═══════ RESPONSIVE ═══════ */
+    @media (max-width: 1024px) {
+      .products-grid { grid-template-columns: repeat(3, 1fr); }
+      .product-card:nth-child(1) { grid-column: span 1; grid-row: span 1; }
+      .product-card:nth-child(4) { grid-column: span 1; }
+      .why-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 860px) {
+      section { padding: 60px 1.5rem; }
+      .about-inner, .sell-inner, .contact-inner { grid-template-columns: 1fr; gap: 36px; }
+      .about-visual { height: 300px; }
+      .sell-visual { display: none; }
+      .hero-content { padding: 100px 1.5rem 60px; }
+      .hero-badge { width: 84px; height: 84px; }
+      .hero-stats { left: 1.5rem; gap: 24px; }
+      .cta-banner { margin: 0 1.5rem; padding: 40px 28px; }
+      nav { padding: 0 1.5rem; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      footer { padding: 40px 1.5rem 24px; }
+      .footer-top { grid-template-columns: 1fr; gap: 28px; }
+    }
+    @media (max-width: 600px) {
+      .products-grid { grid-template-columns: 1fr 1fr; }
+      .why-grid { grid-template-columns: 1fr; }
+      .sell-list { grid-template-columns: 1fr; }
+      .cf-row { grid-template-columns: 1fr; }
+      .hero-headline { font-size: 2.6rem; }
+      .hero-stats { flex-direction: column; gap: 12px; bottom: 20px; }
+      .hero-badge { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- ══════════ NAVBAR ══════════ -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 4L35 16v18H3V16L19 4z" stroke="#7B3F1A" stroke-width="1.5" fill="rgba(200,134,74,0.08)"/>
+        <rect x="14" y="22" width="4" height="12" fill="#7B3F1A" opacity="0.6"/>
+        <rect x="20" y="22" width="4" height="12" fill="#7B3F1A" opacity="0.6"/>
+        <rect x="11" y="18" width="16" height="4" rx="1" fill="#A0522D" opacity="0.7"/>
+        <circle cx="19" cy="14" r="2.5" fill="#C8864A"/>
+      </svg>
+    </div>
+    <div class="nav-logo-text">
+      <div class="nav-brand">RENTIFY</div>
+      <div class="nav-tagline"></div>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#products">Products</a></li>
+    <li><a href="#sells">We Sell</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#contact" class="nav-cta">Contact Us</a></li>
+  </ul>
+  <button class="nav-hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <div class="ham-line"></div>
+    <div class="ham-line"></div>
+    <div class="ham-line"></div>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="toggleMenu()">About</a>
+  <a href="#products" onclick="toggleMenu()">Products</a>
+  <a href="#sells" onclick="toggleMenu()">We Sell</a>
+  <a href="#why" onclick="toggleMenu()">Why Us</a>
+  <a href="#contact" onclick="toggleMenu()">Contact Us</a>
+</div>
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero" id="home">
+  <div class="hero-shape-1"></div>
+  <div class="hero-shape-2"></div>
+  <div class="hero-deco-circle"></div>
+
+  <!-- Decorative room art -->
+  <div class="hero-room-art">
+    <div class="room-art-inner">
+      <div class="room-art-overlay"></div>
+      <!-- CSS furniture -->
+      <div style="position:absolute;bottom:12%;width:70%;height:55%;background:linear-gradient(180deg,#D4B896,#C4A07A);border-radius:60% 60% 8px 8px;box-shadow:0 20px 40px rgba(90,45,12,0.3)"></div>
+      <div style="position:absolute;bottom:40%;left:8%;width:18%;height:30%;background:#C8864A;border-radius:50% 50% 8px 8px"></div>
+      <div style="position:absolute;bottom:40%;right:8%;width:18%;height:30%;background:#C8864A;border-radius:50% 50% 8px 8px"></div>
+      <div style="position:absolute;bottom:7%;width:50%;height:6%;background:rgba(90,45,12,0.25);border-radius:4px;filter:blur(8px)"></div>
+      <div style="position:absolute;top:8%;right:15%;width:3px;height:55%;background:rgba(90,45,12,0.15)"></div>
+      <div style="position:absolute;top:8%;right:15%;width:40px;height:50px;background:rgba(200,134,74,0.4);border-radius:50% 50% 0 0;transform:translateX(-19px)"></div>
+    </div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <div class="eyebrow-line"></div>
+      Importer & Manufacturer
+    </div>
+    <h1 class="hero-headline">
+      Crafting<br/><em>Comfort,</em>
+      <strong>Creating Style</strong>
+    </h1>
+    <div class="hero-sub-line">—Trusted Property Rentals—</div>
+    <p class="hero-desc"> Discover verified houses, apartments, shops, and commercial spaces tailored to your lifestyle and business
+        needs.</p>
+    <div class="hero-actions">
+      <a href="#products" class="btn-primary">Explore Properties</a>
+      <a href="#contact" class="btn-outline-hero">
+        <svg viewBox="0 0 36 36" fill="none">
+          <circle cx="18" cy="18" r="17.25" stroke="#7B3F1A" stroke-width="1.5"/>
+          <path d="M13 18h10M19 14l4 4-4 4" stroke="#7B3F1A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Get In Touch
+      </a>
+    </div>
+  </div>
+
+  <!-- Floating Badge -->
+  <div class="hero-badge" style="top:22%;right:52%">
+    <span class="badge-num">15+</span>
+    <span class="badge-text">Years<br/>Experience</span>
+  </div>
+
+  <!-- Stats -->
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">500+</div>
+      <div class="hero-stat-label">Products</div>
+    </div>
+    <div class="hero-stat-divider"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">2K+</div>
+      <div class="hero-stat-label">Happy Clients</div>
+    </div>
+    <div class="hero-stat-divider"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">10+</div>
+      <div class="hero-stat-label">Brands</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ MARQUEE ══════════ -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <!-- Repeated twice for seamless loop -->
+    <span class="marquee-item"><span class="marquee-dot"></span> Flower Vase</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Room Figurines</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Bed</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Dining Table</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Massage Chair</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Sofa</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Kitchen Cabinet</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Frames</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> TV Console</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Wholesale & Retail</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Flower Vase</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Room Figurines</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Bed</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Dining Table</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Massage Chair</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Sofa</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Kitchen Cabinet</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Frames</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> TV Console</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Wholesale & Retail</span>
+  </div>
+</div>
+
+<!-- ══════════ ABOUT ══════════ -->
+<section class="about-strip reveal" id="about">
+  <div class="about-inner">
+    <div class="about-visual">
+      <div class="about-img-main">🛋️</div>
+      <div class="about-img-accent">🏠</div>
+      <div class="about-years-badge">
+        <div class="ayb-num">15</div>
+        <div class="ayb-txt">Years</div>
+      </div>
+      <div class="about-tag">
+        <strong>2,000+</strong>
+        <span>Happy Customers</span>
+      </div>
+    </div>
+    <div class="about-text">
+      <div class="section-eyebrow"><div class="eyebrow-line"></div> About Us</div>
+      <h2 class="section-title">Where Quality Meets<br/><em>Elegant Design</em></h2>
+      <p class="section-desc">Sky Furniture & Interior is a leading importer and manufacturer of premium home and office furniture. We combine world-class craftsmanship with contemporary design to bring you pieces that transform any space.</p>
+      <div class="about-features">
+        <div class="about-feat">
+          <div class="feat-icon">🏭</div>
+          <div>
+            <div class="feat-title">Direct Manufacturer</div>
+            <div class="feat-desc">Factory-direct pricing ensures you get the best value without middlemen.</div>
+          </div>
+        </div>
+        <div class="about-feat">
+          <div class="feat-icon">🌍</div>
+          <div>
+            <div class="feat-title">Importer & Distributor</div>
+            <div class="feat-desc">Curated international furniture brands delivered to your doorstep.</div>
+          </div>
+        </div>
+        <div class="about-feat">
+          <div class="feat-icon">🛒</div>
+          <div>
+            <div class="feat-title">Wholesale & Retail</div>
+            <div class="feat-desc">Flexible purchasing options for individuals, businesses, and resellers.</div>
+          </div>
+        </div>
+      </div>
+      <a href="#contact" class="btn-primary">Visit Our Showroom</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PRODUCTS ══════════ -->
+<section class="products reveal" id="products">
+  <div class="products-header">
+    <div>
+      <div class="section-eyebrow"><div class="eyebrow-line"></div> Our Collection</div>
+      <h2 class="section-title">Curated <em>Furniture</em><br/>for Every Space</h2>
+    </div>
+    <a href="#sells" class="btn-outline-hero" style="align-self:flex-end;margin-bottom:6px">
+      <svg viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="17.25" stroke="#7B3F1A" stroke-width="1.5"/>
+        <path d="M13 18h10M19 14l4 4-4 4" stroke="#7B3F1A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      View All Products
+    </a>
+  </div>
+  <div class="products-grid">
+    <div class="product-card">
+      <div class="product-thumb">
+        <div class="product-thumb-bg pb-1"></div>
+        <div class="product-emoji">🛋️</div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Living Room</div>
+        <div class="product-name">Premium Sofas & Loungers</div>
+      </div>
+      <div class="product-arrow">→</div>
+    </div>
+    <div class="product-card">
+      <div class="product-thumb">
+        <div class="product-thumb-bg pb-2"></div>
+        <div class="product-emoji">🛏️</div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Bedroom</div>
+        <div class="product-name">Beds & Frames</div>
+      </div>
+      <div class="product-arrow">→</div>
+    </div>
+    <div class="product-card">
+      <div class="product-thumb">
+        <div class="product-thumb-bg pb-3"></div>
+        <div class="product-emoji">🪑</div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Seating</div>
+        <div class="product-name">Chairs & Recliners</div>
+      </div>
+      <div class="product-arrow">→</div>
+    </div>
+    <div class="product-card">
+      <div class="product-thumb">
+        <div class="product-thumb-bg pb-4"></div>
+        <div class="product-emoji">🍽️</div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Dining</div>
+        <div class="product-name">Dining Tables & Sets</div>
+      </div>
+      <div class="product-arrow">→</div>
+    </div>
+    <div class="product-card">
+      <div class="product-thumb">
+        <div class="product-thumb-bg pb-5"></div>
+        <div class="product-emoji">🗄️</div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Storage</div>
+        <div class="product-name">Kitchen Cabinets</div>
+      </div>
+      <div class="product-arrow">→</div>
+    </div>
+    <div class="product-card">
+      <div class="product-thumb">
+        <div class="product-thumb-bg pb-6"></div>
+        <div class="product-emoji">📺</div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Living Room</div>
+        <div class="product-name">TV Consoles</div>
+      </div>
+      <div class="product-arrow">→</div>
+    </div>
+    <div class="product-card">
+      <div class="product-thumb">
+        <div class="product-thumb-bg pb-7"></div>
+        <div class="product-emoji">🌸</div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Decor</div>
+        <div class="product-name">Vases & Figurines</div>
+      </div>
+      <div class="product-arrow">→</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ WE SELL ══════════ -->
+<section class="sell-section reveal" id="sells">
+  <div class="sell-inner">
+    <div class="sell-text">
+      <div class="section-eyebrow"><div class="eyebrow-line" style="background:var(--caramel)"></div> What We Offer</div>
+      <h2 class="section-title">Everything Your<br/>Space <em>Needs</em></h2>
+      <p class="section-desc">From elegant decor to functional furniture — we stock it all. Wholesale and retail options available for every budget.</p>
+      <div class="sell-list">
+        <div class="sell-item"><span class="sell-item-icon">🌸</span><span class="sell-item-name">Flower Vase</span></div>
+        <div class="sell-item"><span class="sell-item-icon">🗿</span><span class="sell-item-name">Room Figurines</span></div>
+        <div class="sell-item"><span class="sell-item-icon">🛏️</span><span class="sell-item-name">Bed</span></div>
+        <div class="sell-item"><span class="sell-item-icon">🍽️</span><span class="sell-item-name">Dining Table</span></div>
+        <div class="sell-item"><span class="sell-item-icon">💆</span><span class="sell-item-name">Massage Chair</span></div>
+        <div class="sell-item"><span class="sell-item-icon">🪑</span><span class="sell-item-name">Chairs</span></div>
+        <div class="sell-item"><span class="sell-item-icon">🛋️</span><span class="sell-item-name">Sofa</span></div>
+        <div class="sell-item"><span class="sell-item-icon">🗄️</span><span class="sell-item-name">Kitchen Cabinet</span></div>
+        <div class="sell-item"><span class="sell-item-icon">🖼️</span><span class="sell-item-name">Frames</span></div>
+        <div class="sell-item"><span class="sell-item-icon">📺</span><span class="sell-item-name">TV Console</span></div>
+      </div>
+    </div>
+    <div class="sell-visual">
+      <div class="sell-card-main">🛋️</div>
+      <div class="sell-card-accent">🪑</div>
+      <div class="sell-badge">
+        <strong>W&R</strong>
+        Wholesale<br/>& Retail
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ WHY US ══════════ -->
+<section class="why-section reveal" id="why">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:0">
+      <div class="section-eyebrow" style="justify-content:center"><div class="eyebrow-line"></div> Why Choose Us <div class="eyebrow-line"></div></div>
+      <h2 class="section-title" style="text-align:center">The Sky Furniture <em>Difference</em></h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-num">01</div>
+        <div class="why-icon">🏆</div>
+        <div class="why-title">Premium Quality</div>
+        <div class="why-desc">Every piece undergoes strict quality checks. We source only the finest materials for lasting durability.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-num">02</div>
+        <div class="why-icon">💰</div>
+        <div class="why-title">Best Prices</div>
+        <div class="why-desc">Factory-direct pricing means unbeatable value. Wholesale rates available for bulk orders.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-num">03</div>
+        <div class="why-icon">🚚</div>
+        <div class="why-title">Fast Delivery</div>
+        <div class="why-desc">Reliable logistics network ensures your furniture arrives safely and on time, every time.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-num">04</div>
+        <div class="why-icon">🎨</div>
+        <div class="why-title">Custom Designs</div>
+        <div class="why-desc">Bespoke furniture tailored to your exact specifications, style, and measurements.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CTA BANNER ══════════ -->
+<div class="cta-banner reveal">
+  <div class="cta-text">
+    <div class="cta-eyebrow">✦ Special Offer</div>
+    <div class="cta-title">Visit Our Showroom &<br/>Get <em>10% Off</em> Today</div>
+    <div class="cta-sub">Plot F/11 Area B Housing Estate, Opp. Lavista Hotel, New Owerri, Imo State</div>
+  </div>
+  <div class="cta-actions">
+    <a href="tel:08085983344" class="btn-cta-light">📞 Call Us Now</a>
+    <a href="#contact" class="btn-cta-outline">Get Directions →</a>
+  </div>
+</div>
+
+<!-- ══════════ CONTACT ══════════ -->
+<section class="contact reveal" id="contact">
+  <div class="contact-inner">
+    <div>
+      <div class="section-eyebrow"><div class="eyebrow-line"></div> Get In Touch</div>
+      <h2 class="section-title">Visit Our<br/><em>Showroom</em></h2>
+      <p class="section-desc">Come experience our furniture in person. Our design consultants are ready to help you find the perfect pieces.</p>
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div class="ci-label">Address</div>
+            <div class="ci-value">Plot F/11 Area B Housing Estate</div>
+            <div class="ci-sub">Opp. Lavista Hotel, New Owerri, Imo State</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div class="ci-label">Phone</div>
+            <div class="ci-value">08085983344</div>
+            <div class="ci-sub">Mon–Sat: 8:00 AM – 6:00 PM</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📸</div>
+          <div>
+            <div class="ci-label">Instagram</div>
+            <div class="ci-value">@Sky_Furnitures</div>
+            <div class="ci-sub">Follow us for daily inspiration</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="contact-form-wrap">
+      <div class="cf-title">Send a Message</div>
+      <div class="cf-sub">We'll get back to you within 24 hours</div>
+      <div class="cf-row">
+        <div class="cf-field">
+          <label>Full Name</label>
+          <input type="text" placeholder="Your name"/>
+        </div>
+        <div class="cf-field">
+          <label>Phone Number</label>
+          <input type="tel" placeholder="Your phone"/>
+        </div>
+      </div>
+      <div class="cf-field">
+        <label>Email Address</label>
+        <input type="email" placeholder="your@email.com"/>
+      </div>
+      <div class="cf-field">
+        <label>Interested In</label>
+        <select>
+          <option value="" disabled selected>Select product category</option>
+          <option>Sofa & Living Room</option>
+          <option>Beds & Bedroom</option>
+          <option>Dining Tables</option>
+          <option>Chairs & Seating</option>
+          <option>Kitchen Cabinets</option>
+          <option>Decor & Accessories</option>
+          <option>Wholesale Inquiry</option>
+          <option>Custom Order</option>
+        </select>
+      </div>
+      <div class="cf-field">
+        <label>Message</label>
+        <textarea placeholder="Tell us about your furniture needs…"></textarea>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center;border:none;cursor:pointer;font-size:0.82rem;letter-spacing:2px">Send Message →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand-name">Sky Furniture</div>
+      <div class="footer-brand-tag">& Interior · Est. 2009</div>
+      <div class="footer-brand-desc">Crafting comfort and creating style since 2009. Premium importer and manufacturer of home and office furniture for discerning customers across Nigeria.</div>
+      <div class="footer-social">
+        <a href="#" title="Instagram">📸</a>
+        <a href="#" title="WhatsApp">💬</a>
+        <a href="#" title="Facebook">👍</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Products</div>
+      <ul class="footer-links">
+        <li><a href="#">Sofas & Loungers</a></li>
+        <li><a href="#">Beds & Frames</a></li>
+        <li><a href="#">Dining Tables</a></li>
+        <li><a href="#">Chairs & Recliners</a></li>
+        <li><a href="#">Kitchen Cabinets</a></li>
+        <li><a href="#">Decor & Frames</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Services</div>
+      <ul class="footer-links">
+        <li><a href="#">Wholesale Supply</a></li>
+        <li><a href="#">Retail Purchase</a></li>
+        <li><a href="#">Custom Orders</a></li>
+        <li><a href="#">Interior Consultation</a></li>
+        <li><a href="#">Delivery & Assembly</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Contact</div>
+      <ul class="footer-links">
+        <li><a href="#">Plot F/11 Area B</a></li>
+        <li><a href="#">New Owerri, Imo State</a></li>
+        <li><a href="tel:08085983344">08085983344</a></li>
+        <li><a href="#">@Sky_Furnitures</a></li>
+        <li><a href="#">Mon–Sat: 8am – 6pm</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2024 Sky Furniture & Interior. All rights reserved.</span>
+    <span>Crafting Comfort, Creating Style ✦</span>
+  </div>
+</footer>
+
+<script>
+  // ── Custom Cursor ──
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`;
+  });
+  function animateRing() {
+    rx += (mx - rx) * 0.14;
+    ry += (my - ry) * 0.14;
+    ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+  document.querySelectorAll('a, button, .product-card, .sell-item, .why-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '18px'; cursor.style.height = '18px';
+      ring.style.width = '52px'; ring.style.height = '52px';
+      ring.style.borderColor = 'rgba(200,134,74,0.6)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '10px'; cursor.style.height = '10px';
+      ring.style.width = '36px'; ring.style.height = '36px';
+      ring.style.borderColor = 'rgba(123,63,26,0.4)';
+    });
+  });
+
+  // ── Navbar scroll ──
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 30);
+  });
+
+  // ── Mobile menu ──
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+
+  // ── Scroll reveal ──
+  const reveals = document.querySelectorAll('.reveal');
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); }
+    });
+  }, { threshold: 0.08 });
+  reveals.forEach(r => revealObs.observe(r));
+
+  // ── Stagger product cards ──
+  const pcards = document.querySelectorAll('.product-card');
+  const cardObs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        e.target.style.transitionDelay = (i * 0.07) + 's';
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+  pcards.forEach(c => {
+    c.style.opacity = '0';
+    c.style.transform = 'translateY(20px)';
+    c.style.transition = 'opacity .5s ease, transform .5s ease';
+    cardObs.observe(c);
+  });
+
+  // ── Smooth counter animation ──
+  function animateValue(el, target, suffix='', prefix='') {
+    let start = 0;
+    const duration = 1800;
+    const step = timestamp => {
+      if (!step.start) step.start = timestamp;
+      const progress = Math.min((timestamp - step.start) / duration, 1);
+      const val = Math.floor(progress * target);
+      el.textContent = prefix + val + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  const statObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const nums = e.target.querySelectorAll('.hero-stat-num');
+        const targets = [500, 2000, 10];
+        const suffixes = ['+', '+', '+'];
+        nums.forEach((el, i) => animateValue(el, targets[i], suffixes[i]));
+        statObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  const heroStats = document.querySelector('.hero-stats');
+  if (heroStats) statObs.observe(heroStats);
+
+  // ── Contact form submit ──
+  document.querySelector('button.btn-primary[style]').addEventListener('click', () => {
+    alert('Thank you! We will contact you shortly. 📞\nCall us: 08085983344');
+  });
+</script>
+</body>
+</html>
