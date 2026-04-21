@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Add Property | Rentify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <style>
+        :root{
+            --teal:#1a6b72;--teal2:#2a8a93;--teal-light:#e8f4f5;
+            --teal-dark:#0f4a50;--accent:#e8a44a;
+            --white:#fff;--off-white:#f8f9fa;
+            --gray:#8a9099;--dark:#1c2226;
+            --border:#e8ecef;--card:#fff;
+            --shadow:0 8px 32px rgba(26,107,114,.10);
+            --err:#e53e3e;--err-bg:#fff5f5;--err-border:#fed7d7;
+            --success:#38a169;--success-bg:#f0fff4;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Jost',sans-serif;background:var(--off-white);color:var(--dark);}
+        a{text-decoration:none;color:inherit;}
+
+        nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 60px;height:68px;box-shadow:0 4px 24px rgba(26,107,114,.08);}
+        .logo{display:flex;align-items:center;gap:8px;}
+        .logo-icon{width:32px;height:32px;background:var(--teal);border-radius:8px 8px 8px 2px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-family:'Cormorant Garamond',serif;font-size:16px;}
+        .logo-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;letter-spacing:.5px;}
+        .logo-name span{color:var(--teal);}
+        .nav-links{display:flex;gap:36px;}
+        .nav-links a{font-size:14px;font-weight:500;color:var(--gray);position:relative;transition:color .2s;}
+        .nav-links a.active{color:var(--dark);}
+        .nav-links a.active::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:var(--teal);border-radius:2px;}
+        .nav-actions{display:flex;gap:16px;align-items:center;}
+        .nav-icon svg{width:20px;height:20px;stroke:var(--dark);fill:none;stroke-width:1.8;cursor:pointer;transition:stroke .2s;}
+        .nav-icon svg:hover{stroke:var(--teal);}
+
+        .page-wrap{margin-top:68px;display:grid;grid-template-columns:240px 1fr 260px;min-height:calc(100vh - 68px);}
+
+        .sidebar{background:var(--teal-dark);position:sticky;top:68px;height:calc(100vh - 68px);overflow-y:auto;display:flex;flex-direction:column;}
+        .sidebar::-webkit-scrollbar{width:3px;}
+        .sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px;}
+        .sb-header{padding:28px 20px 16px;}
+        .sb-label{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px;}
+        .sb-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#fff;line-height:1.2;}
+        .sb-progress{padding:0 20px 20px;}
+        .prog-track{height:3px;background:rgba(255,255,255,.12);border-radius:3px;margin-bottom:6px;}
+        .prog-fill{height:3px;background:var(--accent);border-radius:3px;transition:width .4s;}
+        .prog-text{font-size:11px;color:rgba(255,255,255,.4);}
+        .sb-div{height:1px;background:rgba(255,255,255,.08);margin:0 20px 14px;}
+        .sb-nav{padding:0 10px;flex:1;}
+        .sb-step{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all .2s;margin-bottom:2px;position:relative;}
+        .sb-step:hover{background:rgba(255,255,255,.06);}
+        .sb-step.active{background:rgba(255,255,255,.10);}
+        .sb-step.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--accent);border-radius:0 3px 3px 0;}
+        .step-num{width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s;}
+        .step-num span{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);}
+        .step-num svg{display:none;width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5;}
+        .sb-step.active .step-num{border-color:var(--accent);}
+        .sb-step.active .step-num span{color:var(--accent);}
+        .sb-step.done .step-num{background:var(--accent);border-color:var(--accent);}
+        .sb-step.done .step-num svg{display:block;}
+        .sb-step.done .step-num span{display:none;}
+        .step-name{font-size:12.5px;font-weight:600;color:rgba(255,255,255,.6);line-height:1;}
+        .step-sub{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px;}
+        .sb-step.active .step-name{color:#fff;}
+        .sb-step.active .step-sub{color:rgba(255,255,255,.5);}
+        .sb-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);}
+        .sb-tip{background:rgba(255,255,255,.06);border-radius:10px;padding:12px;}
+        .sb-tip-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+        .sb-tip p{font-size:11.5px;color:rgba(255,255,255,.4);line-height:1.6;}
+
+        .main{padding:36px 36px 60px;min-width:0;}
+        .page-top{margin-bottom:28px;}
+        .breadcrumb{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gray);margin-bottom:12px;}
+        .breadcrumb a{color:var(--teal);font-weight:500;}
+        .breadcrumb svg{width:11px;height:11px;stroke:var(--gray);fill:none;stroke-width:2;}
+        .page-heading{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--dark);line-height:1.15;margin-bottom:4px;}
+        .page-heading span{color:var(--teal);font-style:italic;}
+        .page-sub{font-size:13.5px;color:var(--gray);}
+
+        .fs{background:var(--card);border-radius:14px;border:1.5px solid var(--border);margin-bottom:16px;overflow:hidden;transition:box-shadow .2s;}
+        .fs:hover{box-shadow:var(--shadow);}
+        .fs-head{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
+        .fs-ico{width:34px;height:34px;border-radius:9px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .fs-ico svg{width:16px;height:16px;stroke:var(--teal);fill:none;stroke-width:2;}
+        .fs-ttl{flex:1;}
+        .fs-ttl h3{font-size:14px;font-weight:600;color:var(--dark);}
+        .fs-ttl p{font-size:11.5px;color:var(--gray);margin-top:1px;}
+        .badge{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:20px;}
+        .b-req{background:#fff0e6;color:var(--accent);}
+        .b-opt{background:var(--teal-light);color:var(--teal);}
+        .fs-arr svg{width:18px;height:18px;stroke:var(--gray);fill:none;stroke-width:2;transition:transform .3s;}
+        .fs-body{padding:22px 24px;}
+        .fs-body.col{display:none;}
+
+        .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+        .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+        .s2{grid-column:span 2;}
+        .s3{grid-column:span 3;}
+        .field{display:flex;flex-direction:column;gap:6px;}
+        .lbl{font-size:11px;font-weight:600;color:var(--gray);letter-spacing:.05em;text-transform:uppercase;}
+        .r{color:var(--accent);margin-left:2px;}
+
+        input[type=text],input[type=number],input[type=date],input[type=url],select,textarea{
+            font-family:'Jost',sans-serif;font-size:13.5px;color:var(--dark);
+            background:var(--off-white);border:1.5px solid var(--border);
+            border-radius:9px;padding:10px 13px;width:100%;outline:none;
+            transition:border-color .2s,background .2s,box-shadow .2s;
+        }
+        input:focus,select:focus,textarea:focus{border-color:var(--teal2);background:#fff;box-shadow:0 0 0 3px rgba(42,138,147,.10);}
+        input::placeholder,textarea::placeholder{color:#bfc4ca;}
+        input.error,select.error,textarea.error{border-color:var(--err)!important;background:var(--err-bg);}
+        select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a9099' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;cursor:pointer;}
+        textarea{resize:vertical;min-height:80px;line-height:1.7;}
+
+        .err-msg{font-size:11px;color:var(--err);margin-top:3px;display:none;align-items:center;gap:4px;}
+        .err-msg.show{display:flex;}
+        .err-msg svg{width:11px;height:11px;stroke:var(--err);fill:none;stroke-width:2;flex-shrink:0;}
+
+        .nw{display:flex;}
+        .nw input{border-radius:9px 0 0 9px;}
+        .unit{font-size:12px;font-weight:600;color:var(--teal);white-space:nowrap;padding:10px 12px;background:var(--teal-light);border:1.5px solid var(--border);border-left:none;border-radius:0 9px 9px 0;}
+
+        .area-result{margin-top:12px;padding:12px 16px;background:linear-gradient(135deg,var(--teal-light),#d4eff2);border:1.5px solid var(--teal2);border-radius:10px;display:none;align-items:center;gap:10px;}
+        .area-result.show{display:flex;}
+        .area-result svg{width:16px;height:16px;stroke:var(--teal);fill:none;stroke-width:2;}
+        .area-result-txt{font-size:13px;color:var(--teal-dark);}
+        .area-result-txt strong{font-size:15px;font-weight:700;}
+
+        .cat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:0;}
+        .cat-pill{flex:1;min-width:120px;}
+        .cat-pill input[type=radio]{
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+        .cat-btn{display:flex;align-items:center;gap:8px;padding:12px 16px;border:2px solid var(--border);border-radius:11px;background:var(--off-white);cursor:pointer;transition:all .25s;width:100%;}
+        .cat-btn-ico{width:32px;height:32px;border-radius:8px;background:var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .25px;}
+        .cat-btn-ico svg{width:15px;height:15px;stroke:var(--gray);fill:none;stroke-width:2;}
+        .cat-btn-txt h4{font-size:13px;font-weight:600;color:var(--gray);margin-bottom:1px;}
+        .cat-btn-txt p{font-size:11px;color:var(--gray);}
+        .cat-pill input:checked+.cat-btn{border-color:var(--teal);background:var(--teal-light);}
+        .cat-pill input:checked+.cat-btn .cat-btn-ico{background:var(--teal);}
+        .cat-pill input:checked+.cat-btn .cat-btn-ico svg{stroke:#fff;}
+        .cat-pill input:checked+.cat-btn h4{color:var(--teal-dark);}
+        .cat-pill input:checked+.cat-btn p{color:var(--teal);}
+
+        .type-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+        .tc-chip{cursor:pointer;}
+        .tc-chip input[type=radio]{
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+        .tc-label{display:flex;align-items:center;gap:6px;padding:9px 16px;border:1.5px solid var(--border);border-radius:100px;background:var(--off-white);font-size:13px;font-weight:500;color:var(--gray);transition:all .2s;}
+        .tc-label svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;}
+        .tc-chip input:checked+.tc-label{background:var(--teal-light);border-color:var(--teal2);color:var(--teal);}
+
+        .cond{display:none;}
+        .cond.show{display:block;}
+        .sub{background:var(--off-white);border:1.5px solid var(--border);border-radius:11px;padding:18px;margin-top:16px;}
+        .sub-ttl{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal-dark);margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+        .sub-ttl::before{content:'';width:3px;height:12px;background:var(--accent);border-radius:2px;display:inline-block;}
+
+        .hidden{display:none!important;}
+
+        .info-box{display:flex;align-items:flex-start;gap:9px;background:var(--teal-light);border-radius:9px;padding:11px 13px;margin-top:12px;}
+        .info-box svg{width:14px;height:14px;stroke:var(--teal);fill:none;stroke-width:2;flex-shrink:0;margin-top:1px;}
+        .info-box p{font-size:11.5px;color:var(--teal-dark);line-height:1.6;}
+        .warn-box{display:flex;align-items:flex-start;gap:9px;background:#fff8ee;border:1.5px solid #fde9c4;border-radius:9px;padding:11px 13px;margin-top:12px;}
+        .warn-box svg{width:14px;height:14px;stroke:var(--accent);fill:none;stroke-width:2;flex-shrink:0;margin-top:1px;}
+        .warn-box p{font-size:11.5px;color:#8a5a00;line-height:1.6;}
+
+        .sdiv{height:1px;background:var(--border);margin:16px 0;}
+
+        /* Upload */
+        .upzone{border:2px dashed var(--border);border-radius:11px;background:var(--off-white);padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:0;}
+        .upzone:hover{border-color:var(--teal2);background:var(--teal-light);}
+        .upzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+        .up-ico{width:40px;height:40px;border-radius:11px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;}
+        .up-ico svg{width:18px;height:18px;stroke:var(--teal);fill:none;stroke-width:2;}
+        .upzone h4{font-size:13px;font-weight:600;color:var(--dark);margin-bottom:3px;}
+        .upzone p{font-size:11.5px;color:var(--gray);}
+
+        /* IMAGE PREVIEW GRID */
+        #imgPreviewGrid{margin-top:16px;}
+        #imgPreviewGrid .preview-label{font-size:11px;font-weight:600;color:var(--gray);letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px;}
+        #imgThumbRow{display:flex;flex-wrap:wrap;gap:10px;}
+        .thumb-wrap{position:relative;width:110px;height:90px;border-radius:10px;overflow:hidden;flex-shrink:0;transition:border-color .2s;}
+        .thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+        .thumb-star{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.45);border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s;padding:0;}
+        .thumb-star:hover{background:rgba(0,0,0,.7);transform:scale(1.1);}
+        .thumb-primary-badge{position:absolute;bottom:0;left:0;right:0;background:rgba(232,164,74,.92);color:#fff;font-size:10px;font-weight:700;text-align:center;padding:3px 0;letter-spacing:.5px;}
+        .no-img-note{margin-top:10px;font-size:12px;color:var(--accent);font-weight:500;display:flex;align-items:center;gap:5px;}
+        .no-img-note svg{width:13px;height:13px;stroke:var(--accent);fill:none;stroke-width:2;flex-shrink:0;}
+
+        .form-foot{background:#fff;border-radius:14px;border:1.5px solid var(--border);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+        .foot-note{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--gray);}
+        .foot-note svg{width:13px;height:13px;stroke:var(--teal);fill:none;stroke-width:2;flex-shrink:0;}
+        .btns{display:flex;gap:9px;}
+        .btn-r{padding:10px 20px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--gray);font-family:'Jost',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;}
+        .btn-r:hover{border-color:var(--gray);color:var(--dark);}
+        .btn-p{background:var(--teal);color:#fff;border:none;padding:10px 26px;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;font-family:'Jost',sans-serif;transition:all .3s;box-shadow:0 6px 20px rgba(26,107,114,.25);}
+        .btn-p:hover{background:var(--teal2);transform:translateY(-1px);}
+        .btn-p svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;}
+
+        /* RIGHT PANEL */
+        .right-panel{padding:24px 16px;border-left:1px solid var(--border);position:sticky;top:68px;height:calc(100vh - 68px);overflow-y:auto;display:flex;flex-direction:column;gap:0;}
+        .right-panel::-webkit-scrollbar{width:3px;}
+        .right-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+        .rp-amen-header{margin-bottom:16px;}
+        .rp-amen-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:4px;}
+        .rp-amen-sub{font-size:11.5px;color:var(--gray);line-height:1.5;}
+        .amen-group{margin-bottom:18px;}
+        .amen-group-hdr{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+        .amen-group-hdr::after{content:'';flex:1;height:1px;background:var(--border);}
+        .rp-tg{display:flex;flex-direction:column;gap:6px;}
+        .rp-ti{cursor:pointer;user-select:none;display:block;}
+        .rp-ti input[type=checkbox]{
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+        .rp-tp{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:8px;border:1.5px solid var(--border);background:var(--off-white);font-size:12px;font-weight:500;color:var(--gray);transition:all .2s;width:100%;}
+        .rp-tp svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;}
+        .rp-ti input:checked+.rp-tp{background:var(--teal-light);border-color:var(--teal2);color:var(--teal);}
+        .rp-tp .ck{width:14px;height:14px;border-radius:4px;border:1.5px solid var(--border);background:#fff;margin-left:auto;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+        .rp-ti input:checked+.rp-tp .ck{background:var(--teal);border-color:var(--teal);}
+        .rp-tp .ck svg{width:8px;height:8px;stroke:#fff;fill:none;stroke-width:3;display:none;}
+        .rp-ti input:checked+.rp-tp .ck svg{display:block;}
+        .rp-warn{background:#fff8ee;border:1.5px solid #fde9c4;border-radius:10px;padding:13px;text-align:center;}
+        .rp-warn svg{width:20px;height:20px;stroke:var(--accent);fill:none;stroke-width:2;margin-bottom:8px;}
+        .rp-warn p{font-size:11.5px;color:#8a5a00;line-height:1.6;}
+        .rp-cond{display:none;}
+        .rp-cond.show{display:block;}
+
+        /* Furnished radio chips */
+        .furn-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+        .furn-chip{flex:1;min-width:110px;}
+        .furn-chip input[type=radio]{
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+        .furn-chip label{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;border:1.5px solid var(--border);border-radius:10px;background:var(--off-white);font-size:12px;font-weight:500;color:var(--gray);cursor:pointer;transition:all .2s;width:100%;}
+        .furn-chip label svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;}
+        .furn-chip input:checked+label{background:var(--teal-light);border-color:var(--teal2);color:var(--teal);font-weight:600;}
+
+        /* Furnished sub-feature panels */
+        .furn-panel{display:none;animation:fadeSlideIn .3s ease;}
+        .furn-panel.show{display:block;}
+        @keyframes fadeSlideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+
+        .furn-sub-box{background:#fff;border:1.5px solid var(--teal-light);border-radius:10px;padding:14px;margin-top:10px;}
+        .furn-sub-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal-dark);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+        .furn-sub-title::before{content:'';width:3px;height:10px;background:var(--accent);border-radius:2px;display:inline-block;}
+        .furn-feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+        .ff-item{cursor:pointer;user-select:none;display:block;}
+        .ff-item input[type=checkbox]{display:none;}
+        .ff-tag{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:7px;border:1.5px solid var(--border);background:var(--off-white);font-size:11px;font-weight:500;color:var(--gray);transition:all .2s;}
+        .ff-tag svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;}
+        .ff-item input:checked+.ff-tag{background:var(--teal-light);border-color:var(--teal2);color:var(--teal);}
+
+        /* SUCCESS MODAL */
+        .modal-overlay{position:fixed;inset:0;background:rgba(15,74,80,.6);backdrop-filter:blur(8px);z-index:1000;display:none;align-items:center;justify-content:center;}
+        .modal-overlay.open{display:flex;}
+        .modal{background:#fff;border-radius:24px;padding:48px 40px;max-width:460px;width:90%;text-align:center;box-shadow:0 32px 96px rgba(15,74,80,.28);position:relative;overflow:hidden;animation:modalPop .5s cubic-bezier(.34,1.56,.64,1);}
+        @keyframes modalPop{from{opacity:0;transform:scale(.8) translateY(30px);}to{opacity:1;transform:scale(1) translateY(0);}}
+
+        /* Confetti */
+        .confetti-container{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+        .confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFall linear forwards;}
+        @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(500px) rotate(720deg);opacity:0;}}
+
+        /* Checkmark animation */
+        .modal-icon{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#c6f6d5,#9ae6b4);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;position:relative;}
+        .modal-icon::before{content:'';position:absolute;inset:-6px;border-radius:50%;border:3px solid transparent;border-top-color:var(--success);animation:spinRing .6s ease-out forwards;}
+        @keyframes spinRing{0%{transform:rotate(0deg);opacity:1;}100%{transform:rotate(360deg);opacity:0;}}
+
+        .check-svg{width:42px;height:42px;}
+        .check-path{stroke:var(--success);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:50;stroke-dashoffset:50;animation:drawCheck .5s .2s ease forwards;}
+        @keyframes drawCheck{to{stroke-dashoffset:0;}}
+
+        /* Ripple rings */
+        .ripple-ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(56,161,105,.4);animation:rippleOut .8s ease-out forwards;}
+        .ripple-ring:nth-child(2){animation-delay:.15s;}
+        .ripple-ring:nth-child(3){animation-delay:.3s;}
+        @keyframes rippleOut{0%{transform:scale(1);opacity:.7;}100%{transform:scale(2.2);opacity:0;}}
+
+        .modal h2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--dark);margin-bottom:8px;animation:fadeUp .4s .3s ease both;}
+        .modal-sub{font-size:13.5px;color:var(--gray);line-height:1.7;margin-bottom:28px;animation:fadeUp .4s .4s ease both;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+        .modal-badge{display:inline-flex;align-items:center;gap:6px;background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:700;letter-spacing:.5px;padding:5px 12px;border-radius:100px;margin-bottom:20px;text-transform:uppercase;animation:fadeUp .4s .35s ease both;}
+
+        .modal-btns{display:flex;gap:10px;justify-content:center;animation:fadeUp .4s .5s ease both;}
+        .modal-btn-sec{padding:11px 24px;border-radius:9px;border:1.5px solid var(--border);background:transparent;color:var(--gray);font-family:'Jost',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;}
+        .modal-btn-sec:hover{border-color:var(--gray);color:var(--dark);}
+        .modal-btn-pri{background:var(--teal);color:#fff;border:none;padding:11px 30px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Jost',sans-serif;transition:all .2s;box-shadow:0 6px 20px rgba(26,107,114,.25);}
+        .modal-btn-pri:hover{background:var(--teal2);}
+
+        .val-banner{background:var(--err-bg);border:1.5px solid var(--err-border);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:none;align-items:flex-start;gap:10px;}
+        .val-banner.show{display:flex;}
+        .val-banner svg{width:16px;height:16px;stroke:var(--err);fill:none;stroke-width:2;flex-shrink:0;margin-top:1px;}
+        .val-banner-txt h4{font-size:13px;font-weight:600;color:var(--err);margin-bottom:3px;}
+        .val-banner-txt ul{font-size:12px;color:#c53030;padding-left:16px;line-height:1.8;}
+
+        @media(max-width:1200px){.page-wrap{grid-template-columns:220px 1fr 220px;}}
+        @media(max-width:1000px){.page-wrap{grid-template-columns:220px 1fr;}.right-panel{display:none;}}
+        @media(max-width:760px){.page-wrap{grid-template-columns:1fr;}.sidebar{position:static;height:auto;}.main{padding:20px 16px 48px;}.g2,.g3{grid-template-columns:1fr;}.s2,.s3{grid-column:span 1;}}
+        @media(max-width:600px){nav{padding:0 20px;}.nav-links{display:none;}}
+    </style>
+</head>
+<body>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal">
+        <!-- Confetti -->
+        <div class="confetti-container" id="confettiContainer"></div>
+
+        <div class="modal-icon">
+            <div class="ripple-ring"></div>
+            <div class="ripple-ring"></div>
+            <div class="ripple-ring"></div>
+            <svg class="check-svg" viewBox="0 0 24 24">
+                <polyline class="check-path" points="20 6 9 17 4 12"/>
+            </svg>
+        </div>
+
+        <div class="modal-badge">
+            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Property Submitted
+        </div>
+
+        <h2>You're All Set! 🎉</h2>
+        <p class="modal-sub">Your property has been successfully submitted. Our team will review it within 24 hours and get back to you.</p>
+
+        <div class="modal-btns">
+            <button class="modal-btn-sec" onclick="window.location.href='/add'">Add Another</button>
+            <button class="modal-btn-pri" onclick="window.location.href='/properties'">View All Properties</button>
+        </div>
+    </div>
+</div>
+
+<!-- NAV -->
+<nav>
+    <div class="logo">
+        <div class="logo-icon">R</div>
+        <div class="logo-name">RENTIFY<span>.</span></div>
+    </div>
+    <div class="nav-links">
+        <a th:href="@{/home}">Home</a><a th:href="@{/properties}">Properties</a><a href="#">Category</a>
+        <a href="#" class="active">Add Property</a><a href="#">Contact Us</a>
+    </div>
+    <div class="nav-actions">
+        <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+    </div>
+</nav>
+
+<div class="page-wrap">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sb-header">
+            <div class="sb-label">Listing Wizard</div>
+            <div class="sb-title">Add New<br>Property</div>
+        </div>
+        <div class="sb-progress">
+            <div class="prog-track"><div class="prog-fill" id="progFill" style="width:20%"></div></div>
+            <div class="prog-text" id="progText">Step 1 of 5</div>
+        </div>
+        <div class="sb-div"></div>
+        <nav class="sb-nav">
+            <div class="sb-step active" onclick="goStep(1)">
+                <div class="step-num"><span>1</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div><div class="step-name">Category &amp; Type</div><div class="step-sub">Residential / Commercial</div></div>
+            </div>
+            <div class="sb-step" onclick="goStep(2)">
+                <div class="step-num"><span>2</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div><div class="step-name">Basic Info</div><div class="step-sub">Listing type &amp; dates</div></div>
+            </div>
+            <div class="sb-step" onclick="goStep(3)">
+                <div class="step-num"><span>3</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div><div class="step-name">Location</div><div class="step-sub">City, area &amp; direction</div></div>
+            </div>
+            <div class="sb-step" onclick="goStep(4)">
+                <div class="step-num"><span>4</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div><div class="step-name">Dimensions &amp; Price</div><div class="step-sub">Size, floor &amp; pricing</div></div>
+            </div>
+            <div class="sb-step" onclick="goStep(5)">
+                <div class="step-num"><span>5</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div><div class="step-name">Media &amp; Submit</div><div class="step-sub">Photos &amp; final review</div></div>
+            </div>
+        </nav>
+        <div class="sb-footer">
+            <div class="sb-tip">
+                <div class="sb-tip-lbl">Pro Tip</div>
+                <p>Properties with 5+ photos get 4× more enquiries from buyers.</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <div class="page-top">
+            <div class="breadcrumb">
+                <a href="#">Home</a>
+                <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                <a href="#">Properties</a>
+                <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                <span>Add Property</span>
+            </div>
+            <div class="page-heading">List Your <span>Property</span></div>
+            <div class="page-sub">Fill in the details — your listing goes live after review.</div>
+        </div>
+
+        <div class="val-banner" id="valBanner">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div class="val-banner-txt">
+                <h4>Please fill in the required fields:</h4>
+                <ul id="valList"></ul>
+            </div>
+        </div>
+
+        <form th:action="@{/setproperty}" action="/setproperty" method="post" enctype="multipart/form-data" id="propForm" novalidate>
+
+            <!-- ─── SECTION 1: CATEGORY & TYPE ─── -->
+            <div class="fs" id="sec1">
+                <div class="fs-head" onclick="tog('b1','a1',1)">
+                    <div class="fs-ico"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+                    <div class="fs-ttl"><h3>Category &amp; Property Type</h3><p>Select a category first, then choose the property type</p></div>
+                    <span class="badge b-req">Required</span>
+                    <div class="fs-arr"><svg id="a1" viewBox="0 0 24 24" style="transform:rotate(180deg)"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
+                <div class="fs-body" id="b1">
+                    <label class="lbl" style="margin-bottom:10px;">Category <span class="r">*</span></label>
+                    <div class="cat-row">
+                        <div class="cat-pill">
+                            <input type="radio" name="categoryId" id="cat-res" value="1"/>
+                            <label class="cat-btn" for="cat-res">
+                                <div class="cat-btn-ico"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+                                <div class="cat-btn-txt"><h4>Residential</h4><p>For living spaces</p></div>
+                            </label>
+                        </div>
+                        <div class="cat-pill">
+                            <input type="radio" name="categoryId" id="cat-com" value="2"/>
+                            <label class="cat-btn" for="cat-com">
+                                <div class="cat-btn-ico"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
+                                <div class="cat-btn-txt"><h4>Commercial</h4><p>For business use</p></div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="err-msg" id="e-category" style="margin-top:8px;">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+                        Please select a category
+                    </div>
+
+                    <!-- Residential types -->
+                    <div id="res-types" class="cond">
+                        <div style="margin-top:20px;">
+                            <label class="lbl" style="margin-bottom:10px;">Property Type <span class="r">*</span></label>
+                            <div class="type-chips">
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="House"/><span class="tc-label"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>House</span></label>
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="Flat"/><span class="tc-label"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>Flat / Apartment</span></label>
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="Villa"/><span class="tc-label"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11"/><path d="M9 22V12h6v10"/></svg>Villa</span></label>
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="Building"/><span class="tc-label"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="1"/><line x1="9" y1="22" x2="9" y2="2"/></svg>Building</span></label>
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="PG"/><span class="tc-label"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>PG / Hostel</span></label>
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="Other"/><span class="tc-label"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>Other</span></label>
+                            </div>
+                        </div>
+                        <div class="sub">
+                            <div class="sub-ttl">Residential Details</div>
+                            <div class="g3">
+                                <div class="field">
+                                    <label class="lbl">No. of Rooms</label>
+                                    <input type="number" name="noOfRoom" id="noOfRoom" placeholder="3" min="0"/>
+                                </div>
+                                <div class="field">
+                                    <label class="lbl">Max Members</label>
+                                    <input type="number" name="noOfMember" id="noOfMember" placeholder="6" min="0"/>
+                                </div>
+                                <div class="field">
+                                    <label class="lbl">BHK Type</label>
+                                    <select name="bhk">
+                                        <option value="">Select BHK</option>
+                                        <option value="1RK">1 RK</option>
+                                        <option value="1BHK">1 BHK</option>
+                                        <option value="2BHK">2 BHK</option>
+                                        <option value="3BHK">3 BHK</option>
+                                        <option value="4BHK">4 BHK</option>
+                                        <option value="4+BHK">4+ BHK</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Commercial types -->
+                    <div id="com-types" class="cond">
+                        <div style="margin-top:20px;">
+                            <label class="lbl" style="margin-bottom:10px;">Property Type <span class="r">*</span></label>
+                            <div class="type-chips">
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="Shop"/><span class="tc-label"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>Shop / Retail</span></label>
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="Office"/><span class="tc-label"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>Office Space</span></label>
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="Warehouse"/><span class="tc-label"><svg viewBox="0 0 24 24"><path d="M2 20V8l10-6 10 6v12H2z"/><rect x="9" y="14" width="6" height="6"/></svg>Warehouse</span></label>
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="Cold Storage"/><span class="tc-label"><svg viewBox="0 0 24 24"><path d="M2 20V8l10-6 10 6v12H2z"/><rect x="9" y="14" width="6" height="6"/></svg>Cold Storage</span></label>
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="Showroom"/><span class="tc-label"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>Showroom</span></label>
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="Plot/Land"/><span class="tc-label"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>Plot / Land</span></label>
+                                <label class="tc-chip"><input type="radio" name="propertyType" value="Other"/><span class="tc-label"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>Other</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="err-msg" id="e-propType" style="margin-top:8px;">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+                        Please select a property type
+                    </div>
+                    <div class="warn-box" id="cat-hint" style="display:flex;">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <p>Select a <strong>Category</strong> first — property types will appear below.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── SECTION 2: BASIC INFO ─── -->
+            <div class="fs" id="sec2">
+                <div class="fs-head" onclick="tog('b2','a2',2)">
+                    <div class="fs-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                    <div class="fs-ttl"><h3>Basic Information</h3><p>Listing type, description and dates</p></div>
+                    <span class="badge b-req">Required</span>
+                    <div class="fs-arr"><svg id="a2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
+                <div class="fs-body col" id="b2">
+                    <div class="g2">
+                        <div class="field s2">
+                            <label class="lbl">Description</label>
+                            <textarea name="description" id="fDesc" placeholder="Describe key features, surroundings and highlights..."></textarea>
+                        </div>
+                        <div class="field">
+                            <label class="lbl">Listing Type <span class="r">*</span></label>
+                            <select name="listingType" id="fListingType">
+                                <option value="">Select type</option>
+                                <option value="RENT" selected>For Rent</option>
+                                <option value="SALE">For Sale</option>
+                            </select>
+                            <div class="err-msg" id="e-listingType">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+                                Please select a listing type
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="lbl">Duration</label>
+                            <input type="text" name="duration" placeholder="e.g. Long-term, 6 months"/>
+                        </div>
+                        <div class="field">
+                            <label class="lbl">Post Date</label>
+                            <input type="date" name="postDate"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── SECTION 3: LOCATION ─── -->
+            <div class="fs" id="sec3">
+                <div class="fs-head" onclick="tog('b3','a3',3)">
+                    <div class="fs-ico"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                    <div class="fs-ttl"><h3>Location Details</h3><p>City, area, landmark and facing direction</p></div>
+                    <span class="badge b-req">Required</span>
+                    <div class="fs-arr"><svg id="a3" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
+                <div class="fs-body col" id="b3">
+                    <div class="g2">
+                        <div class="field">
+                            <label class="lbl">City <span class="r">*</span></label>
+                            <input type="text" name="city" id="fCity" placeholder="e.g. Bhopal"/>
+                            <div class="err-msg" id="e-city">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+                                Please enter the city name
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="lbl">Location / Area</label>
+                            <input type="text" name="location" placeholder="e.g. Arera Colony"/>
+                        </div>
+                        <div class="field">
+                            <label class="lbl">Landmark</label>
+                            <input type="text" name="landmark" placeholder="e.g. Near DB Mall"/>
+                        </div>
+                        <div class="field">
+                            <label class="lbl">Facing Direction</label>
+                            <select name="direction">
+                                <option value="">Select direction</option>
+                                <option>North</option>
+                                <option>South</option>
+                                <option>East</option>
+                                <option>West</option>
+                                <option>North-East</option>
+                                <option>North-West</option>
+                                <option>South-East</option>
+                                <option>South-West</option>
+                                <option value="I Don't Know">I Don't Know</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── SECTION 4: DIMENSIONS & PRICING ─── -->
+            <div class="fs" id="sec4">
+                <div class="fs-head" onclick="tog('b4','a4',4)">
+                    <div class="fs-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg></div>
+                    <div class="fs-ttl"><h3>Dimensions &amp; Pricing</h3><p>Area, floor, price and security deposit</p></div>
+                    <span class="badge b-req">Required</span>
+                    <div class="fs-arr"><svg id="a4" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
+                <div class="fs-body col" id="b4">
+                    <div class="g3">
+                        <div class="field">
+                            <label class="lbl">Length (ft)</label>
+                            <div class="nw"><input type="number" name="length" id="fLength" placeholder="0.0" step="0.01" min="0"/><span class="unit">ft</span></div>
+                        </div>
+                        <div class="field">
+                            <label class="lbl">Width (ft)</label>
+                            <div class="nw"><input type="number" name="width" id="fWidth" placeholder="0.0" step="0.01" min="0"/><span class="unit">ft</span></div>
+                        </div>
+                        <div class="field" id="floorField">
+                            <label class="lbl">Floor No.</label>
+                            <input type="number" name="floor" placeholder="0" min="0"/>
+                        </div>
+                        <div class="field">
+                            <label class="lbl">Price (₹) <span class="r">*</span></label>
+                            <div class="nw"><input type="number" name="price" id="fPrice" placeholder="0" min="0"/><span class="unit">₹</span></div>
+                            <div class="err-msg" id="e-price">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+                                Please enter a valid price
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="lbl">Security Deposit (₹)</label>
+                            <div class="nw"><input type="number" name="securityDeposit" placeholder="0" min="0"/><span class="unit">₹</span></div>
+                        </div>
+                    </div>
+                    <div class="area-result" id="areaResult">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+                        <div class="area-result-txt">Calculated Area: <strong id="areaVal">0</strong> sq.ft</div>
+                    </div>
+                    <input type="hidden" name="area" id="fArea"/>
+                </div>
+            </div>
+
+            <!-- ─── SECTION 5: MEDIA & SUBMIT ─── -->
+            <div class="fs" id="sec5">
+                <div class="fs-head" onclick="tog('b5','a5',5)">
+                    <div class="fs-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                    <div class="fs-ttl"><h3>Media</h3><p>Upload property photos — at least one image required</p></div>
+                    <span class="badge b-req">Required</span>
+                    <div class="fs-arr"><svg id="a5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
+                <div class="fs-body col" id="b5">
+                    <!-- Upload zone -->
+                    <div class="upzone" id="upzone">
+                        <input type="file" name="files" id="fileInput" multiple accept="image/*,video/*"/>
+                        <div class="up-ico"><svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg></div>
+                        <h4>Drag &amp; drop or click to browse</h4>
+                        <p>JPG, PNG, MP4 · Max 10 files · 5 MB each</p>
+                    </div>
+
+                    <!-- "no image" note shown until images are added -->
+                    <div class="no-img-note" id="noImgNote">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Kam se kam ek image upload karein — "Add Property" button tab active hoga.
+                    </div>
+
+                    <!-- Primary image index (sent to server) -->
+                    <input type="hidden" name="primaryImageIndex" id="primaryImageIndex" value="0"/>
+
+                    <!-- Image preview grid -->
+                    <div id="imgPreviewGrid" style="display:none;margin-top:16px;">
+                        <div class="preview-label">Preview — ★ click karke primary image set karein</div>
+                        <div id="imgThumbRow"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Amenities hidden inputs — form ke ANDAR -->
+            <div id="amenities-hidden-inputs" style="display:none;">
+                <input type="hidden" name="amenitiesParking"         id="h-amenitiesParking"         value="false"/>
+                <input type="hidden" name="amenitiesSecurity"        id="h-amenitiesSecurity"        value="false"/>
+                <input type="hidden" name="amenitiesLift"            id="h-amenitiesLift"            value="false"/>
+                <input type="hidden" name="amenitiesWifi"            id="h-amenitiesWifi"            value="false"/>
+                <input type="hidden" name="amenitiesGarden"          id="h-amenitiesGarden"          value="false"/>
+                <input type="hidden" name="amenitiesAttachedBathroom" id="h-amenitiesAttachedBathroom" value="false"/>
+                <input type="hidden" name="amenitiesTerrace"         id="h-amenitiesTerrace"         value="false"/>
+            </div>
+
+            <!-- FORM FOOTER -->
+            <div class="form-foot">
+                <div class="foot-note">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    Fields marked <strong style="color:var(--accent)">*</strong> are required.
+                </div>
+                <div class="btns">
+                    <button type="button" class="btn-r" onclick="resetAll()">Clear</button>
+                    <!-- FIX 1: id="submitBtn" added -->
+                    <button type="button" class="btn-p" id="submitBtn" onclick="handleSubmit()">
+                        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        Submit Property
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </main>
+
+    <!-- RIGHT PANEL — AMENITIES -->
+    <aside class="right-panel">
+        <div class="rp-amen-header">
+            <div class="rp-amen-title">Amenities &amp; Features</div>
+            <div class="rp-amen-sub">Select a category to see amenities options</div>
+        </div>
+
+        <div id="rp-no-cat" class="rp-warn" style="margin-bottom:16px;">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <p>Select a <strong>Category</strong> in Step 1 — amenities will appear here.</p>
+        </div>
+
+        <!-- Common — always shown after category pick -->
+        <div id="rp-common" class="rp-cond">
+            <div class="amen-group">
+                <div class="amen-group-hdr">Common</div>
+                <div class="rp-tg">
+                    <label class="rp-ti" id="amen-electricity">
+                        <input type="hidden"   name="eletricity"  value="false"/>
+                        <input type="checkbox" name="eletricity" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Electricity<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti" id="amen-water">
+                        <input type="hidden"   name="waterSupply" value="false"/>
+                        <input type="checkbox" name="waterSupply" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>Water Supply<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="hidden"   name="parking" value="false"/>
+                        <input type="checkbox" name="parking" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Parking<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="hidden"   name="negotiable" value="false"/>
+                        <input type="checkbox" name="negotiable" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Negotiable<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="hidden"   name="status" value="false"/>
+                        <input type="checkbox" name="status" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Available Now<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="amen-group" id="rp-additional">
+                <div class="amen-group-hdr">Additional</div>
+                <div class="rp-tg">
+                    <label class="rp-ti">
+                        <input type="hidden"   name="amenitiesParking" value="false"/>
+                        <input type="checkbox" name="amenitiesParking" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Covered Parking<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="hidden"   name="amenitiesSecurity" value="false"/>
+                        <input type="checkbox" name="amenitiesSecurity" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Security Guard<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti" id="amen-lift">
+                        <input type="hidden"   name="amenitiesLift" value="false"/>
+                        <input type="checkbox" name="amenitiesLift" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="6" x2="12" y2="10"/><polyline points="9 8 12 5 15 8"/></svg>Lift / Elevator<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti" id="amen-wifi">
+                        <input type="hidden"   name="amenitiesWifi" value="false"/>
+                        <input type="checkbox" name="amenitiesWifi" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>WiFi<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="hidden"   name="amenitiesGarden" value="false"/>
+                        <input type="checkbox" name="amenitiesGarden" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M12 22V12M12 12C12 7 7 4 2 6c5 1 8 4 10 6M12 12c0-5 5-8 10-6-5 1-8 4-10 6"/></svg>Garden<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti" id="amen-bathroom">
+                        <input type="hidden"   name="amenitiesAttachedBathroom" value="false"/>
+                        <input type="checkbox" name="amenitiesAttachedBathroom" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M9 6V3.5a2.5 2.5 0 015 0V6"/><rect x="2" y="6" width="20" height="8" rx="2"/><path d="M4 14v4M20 14v4"/></svg>Attached Bathroom<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="hidden"   name="amenitiesTerrace" value="false"/>
+                        <input type="checkbox" name="amenitiesTerrace" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>Terrace<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESIDENTIAL SPECIFIC amenities -->
+        <div id="rp-res-amen" class="rp-cond">
+            <div class="amen-group">
+                <div class="amen-group-hdr">Residential</div>
+
+                <!-- Furnished Status -->
+                <div style="margin-bottom:14px;">
+                    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;">Furnished Status</div>
+                    <div class="furn-chips">
+                        <div class="furn-chip">
+                            <input type="radio" name="furnishedStatus" id="furn-full" value="Fully Furnished"/>
+                            <label for="furn-full"><svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M8 21v-2M16 21v-2"/></svg>Fully</label>
+                        </div>
+                        <div class="furn-chip">
+                            <input type="radio" name="furnishedStatus" id="furn-semi" value="Semi Furnished"/>
+                            <label for="furn-semi"><svg viewBox="0 0 24 24"><rect x="3" y="10" width="18" height="8" rx="2"/><path d="M7 10V7M17 10V7"/></svg>Semi</label>
+                        </div>
+                        <div class="furn-chip">
+                            <input type="radio" name="furnishedStatus" id="furn-un" value="Unfurnished"/>
+                            <label for="furn-un"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>Unfurnished</label>
+                        </div>
+                    </div>
+
+                    <!-- FULLY FURNISHED features -->
+                    <div class="furn-panel" id="panel-fully">
+                        <div class="furn-sub-box">
+                            <div class="furn-sub-title">Fully Furnished Includes</div>
+                            <div class="furn-feature-grid">
+                                <label class="ff-item"><input type="checkbox" name="furnFeat_sofa" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/></svg>Sofa Set</span></label>
+                                <label class="ff-item"><input type="checkbox" name="furnFeat_bed" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 012-2h16a2 2 0 012 2v8"/><path d="M2 10V6a2 2 0 012-2h16a2 2 0 012 2v4"/></svg>Bed + Mattress</span></label>
+                                <label class="ff-item"><input type="checkbox" name="furnFeat_wardrobe" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="12" y1="2" x2="12" y2="22"/></svg>Wardrobe</span></label>
+                                <label class="ff-item"><input type="checkbox" name="furnFeat_ac" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="10" rx="2"/><path d="M12 13v8"/></svg>Air Conditioner</span></label>
+                                <label class="ff-item"><input type="checkbox" name="furnFeat_tv" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Television</span></label>
+                                <label class="ff-item"><input type="checkbox" name="furnFeat_fridge" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/></svg>Refrigerator</span></label>
+                                <label class="ff-item"><input type="checkbox" name="furnFeat_washing" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><circle cx="12" cy="13" r="4"/></svg>Washing Machine</span></label>
+                                <label class="ff-item"><input type="checkbox" name="furnFeat_microwave" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><rect x="17" y="9" width="2" height="2"/></svg>Microwave</span></label>
+                                <label class="ff-item"><input type="checkbox" name="furnFeat_geyser" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><path d="M12 22V12M12 12C12 7 7 4 2 6"/></svg>Geyser</span></label>
+                                <label class="ff-item"><input type="checkbox" name="furnFeat_curtains" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><line x1="4" y1="3" x2="4" y2="21"/><line x1="20" y1="3" x2="20" y2="21"/><path d="M4 3h16M4 21h16"/></svg>Curtains</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEMI FURNISHED features -->
+                    <div class="furn-panel" id="panel-semi">
+                        <div class="furn-sub-box">
+                            <div class="furn-sub-title">Semi Furnished Includes</div>
+                            <div class="furn-feature-grid">
+                                <label class="ff-item"><input type="checkbox" name="semiFeat_bed" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><path d="M2 20v-8a2 2 0 012-2h16a2 2 0 012 2v8"/></svg>Bed Frame</span></label>
+                                <label class="ff-item"><input type="checkbox" name="semiFeat_wardrobe" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="12" y1="2" x2="12" y2="22"/></svg>Wardrobe</span></label>
+                                <label class="ff-item"><input type="checkbox" name="semiFeat_fans" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 010 20"/></svg>Ceiling Fans</span></label>
+                                <label class="ff-item"><input type="checkbox" name="semiFeat_geysers" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><path d="M12 22V12M12 12C12 7 7 4 2 6"/></svg>Geyser</span></label>
+                                <label class="ff-item"><input type="checkbox" name="semiFeat_lights" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M12 12v4M8 20h8"/></svg>Light Fixtures</span></label>
+                                <label class="ff-item"><input type="checkbox" name="semiFeat_kitchen" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="10" rx="2"/><path d="M8 10V6M16 10V6"/></svg>Modular Kitchen</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- UNFURNISHED features -->
+                    <div class="furn-panel" id="panel-unfurnished">
+                        <div class="furn-sub-box">
+                            <div class="furn-sub-title">Available Structure &amp; Fittings</div>
+                            <div class="furn-feature-grid">
+                                <label class="ff-item"><input type="checkbox" name="unFeat_flooring" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>Good Flooring</span></label>
+                                <label class="ff-item"><input type="checkbox" name="unFeat_paint" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><path d="M2 16l5-5 4 4 6-8 5 5"/></svg>Fresh Paint</span></label>
+                                <label class="ff-item"><input type="checkbox" name="unFeat_wiring" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Electrical Wiring</span></label>
+                                <label class="ff-item"><input type="checkbox" name="unFeat_plumbing" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>Plumbing Done</span></label>
+                                <label class="ff-item"><input type="checkbox" name="unFeat_readymove" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Ready to Move</span></label>
+                                <label class="ff-item"><input type="checkbox" name="unFeat_modkitchen" value="true"/><span class="ff-tag"><svg viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="10" rx="2"/><path d="M8 10V6M16 10V6"/></svg>Kitchen Counter</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rp-tg">
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesGatedSociety" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Gated Society<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesBalcony" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>Balcony<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesPetFriendly" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><circle cx="4.5" cy="9.5" r="2.5"/><circle cx="9" cy="5.5" r="2.5"/><circle cx="15" cy="5.5" r="2.5"/><circle cx="19.5" cy="9.5" r="2.5"/><path d="M12 20a7 7 0 01-7-7c0-1.5.7-3 2-4h10c1.3 1 2 2.5 2 4a7 7 0 01-7 7z"/></svg>Pet Friendly<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesGym" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M6.5 6.5h11M6.5 17.5h11M3 12h18M6 9v6M18 9v6"/></svg>Gym / Fitness<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesSwimming" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M2 12h20M2 16c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><circle cx="12" cy="8" r="2"/></svg>Swimming Pool<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesPlayground" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>Children's Play Area<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesAC" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="10" rx="2"/><path d="M12 13v8M8 17l4 4 4-4"/></svg>Air Conditioning<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesIntercom" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>Intercom<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMMERCIAL SPECIFIC amenities -->
+        <div id="rp-com-amen" class="rp-cond">
+            <div class="amen-group">
+                <div class="amen-group-hdr">Commercial</div>
+                <div class="rp-tg">
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesReception" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>Reception Area<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesConference" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Conference Room<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenities247Access" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>24/7 Access<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti" id="amen-loading">
+                        <input type="checkbox" name="amenitiesLoadingDock" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M2 20V8l10-6 10 6v12H2z"/><rect x="9" y="14" width="6" height="6"/></svg>Loading Dock<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti" id="amen-cafeteria">
+                        <input type="checkbox" name="amenitiesCafeteria" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Cafeteria<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesPowerBackup" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Power Backup<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesFireSafety" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/><path d="M9 12l2 2 4-4"/></svg>Fire Safety<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesCCTV" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>CCTV Surveillance<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesServerRoom" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>Server Room<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                    <label class="rp-ti">
+                        <input type="checkbox" name="amenitiesHouseKeeping" value="true"/>
+                        <span class="rp-tp"><svg viewBox="0 0 24 24"><path d="M3 22V12a9 9 0 0118 0v10"/><path d="M9 22v-4h6v4"/></svg>Housekeeping<span class="ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+</div>
+
+<script>
+    // FIX 3: currentPropType declare kiya
+    let currentPropType = '';
+
+    // ── AMENITY RULES per property type ──
+    const AMENITY_RULES = {
+        'Plot/Land': { hideFloor:true, hideElectricity:true, hideWater:true, hideLift:true, hideWifi:true, hideBathroom:true, hideAdditional:true },
+        'Warehouse': { hideWifi:true, hideBathroom:true },
+        'Cold Storage': { hideWifi:true, hideBathroom:true },
+    };
+
+    function applyAmenityRules(type) {
+        const rules = AMENITY_RULES[type] || {};
+        const tog = (id, hide) => { const el=document.getElementById(id); if(el) el.classList.toggle('hidden', !!hide); };
+        document.getElementById('floorField').classList.toggle('hidden', !!rules.hideFloor);
+        tog('amen-electricity', rules.hideElectricity);
+        tog('amen-water', rules.hideWater);
+        tog('amen-lift', rules.hideLift);
+        tog('amen-wifi', rules.hideWifi);
+        tog('amen-bathroom', rules.hideBathroom);
+        tog('rp-additional', rules.hideAdditional);
+    }
+
+    document.querySelectorAll('input[name="propertyType"]').forEach(r => {
+        r.addEventListener('change', () => {
+            currentPropType = r.value;
+            applyAmenityRules(r.value);
+        });
+    });
+
+    // ── FURNISHED STATUS PANELS ──
+    const furnMap = {
+        'furn-full':  'panel-fully',
+        'furn-semi':  'panel-semi',
+        'furn-un':    'panel-unfurnished'
+    };
+
+    document.querySelectorAll('input[name="furnishedStatus"]').forEach(r => {
+        r.addEventListener('change', function() {
+            Object.values(furnMap).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('show');
+            });
+            const target = furnMap[this.id];
+            if (target) {
+                const panel = document.getElementById(target);
+                if (panel) panel.classList.add('show');
+            }
+        });
+    });
+
+    function syncAmenities() {
+        const map = {
+            'amenitiesParking':          'h-amenitiesParking',
+            'amenitiesSecurity':         'h-amenitiesSecurity',
+            'amenitiesLift':             'h-amenitiesLift',
+            'amenitiesWifi':             'h-amenitiesWifi',
+            'amenitiesGarden':           'h-amenitiesGarden',
+            'amenitiesAttachedBathroom': 'h-amenitiesAttachedBathroom',
+            'amenitiesTerrace':          'h-amenitiesTerrace',
+        };
+        Object.entries(map).forEach(([name, hiddenId]) => {
+            const cb = document.querySelector(`input[type=checkbox][name="${name}"]:checked`);
+            document.getElementById(hiddenId).value = cb ? 'true' : 'false';
+        });
+    }
+
+    // ── SECTION TOGGLE ──
+    function tog(bodyId, arrId, n) {
+        const body = document.getElementById(bodyId);
+        const arr  = document.getElementById(arrId);
+        const isCol = body.classList.toggle('col');
+        arr.style.transform = isCol ? '' : 'rotate(180deg)';
+        if (!isCol) syncStep(n);
+    }
+
+    function goStep(n) {
+        const b = document.getElementById('b'+n);
+        const a = document.getElementById('a'+n);
+        if (b.classList.contains('col')) { b.classList.remove('col'); a.style.transform = 'rotate(180deg)'; }
+        document.getElementById('sec'+n).scrollIntoView({behavior:'smooth',block:'start'});
+        syncStep(n);
+    }
+
+    function syncStep(active) {
+        document.querySelectorAll('.sb-step').forEach((s,i) => {
+            s.classList.remove('active','done');
+            if (i+1 < active) s.classList.add('done');
+            if (i+1 === active) s.classList.add('active');
+        });
+        const pct = Math.round((active/5)*100);
+        document.getElementById('progFill').style.width = pct+'%';
+        document.getElementById('progText').textContent = 'Step '+active+' of 5';
+    }
+
+    // ── CATEGORY SELECTION ──
+    function pickCategory(cat) {
+        ['res-types','com-types'].forEach(id => document.getElementById(id).classList.remove('show'));
+        document.getElementById('cat-hint').style.display = 'none';
+        document.querySelectorAll('input[name="propertyType"]').forEach(r => r.checked = false);
+        applyAmenityRules('');
+        currentPropType = '';
+
+        document.getElementById('rp-no-cat').style.display = 'none';
+        document.getElementById('rp-common').classList.add('show');
+        document.getElementById('rp-res-amen').classList.remove('show');
+        document.getElementById('rp-com-amen').classList.remove('show');
+
+        if (cat === 'res') {
+            document.getElementById('res-types').classList.add('show');
+            document.getElementById('rp-res-amen').classList.add('show');
+
+            // FIX 4: disabled nahi karo, sirf value clear karo
+            document.getElementById('noOfRoom').value = '';
+            document.getElementById('noOfMember').value = '';
+
+        } else if (cat === 'com') {
+            document.getElementById('com-types').classList.add('show');
+            document.getElementById('rp-com-amen').classList.add('show');
+
+            // FIX 4: disabled ki jagah value clear karo (disabled fields DB mein null bhejte hain)
+            document.getElementById('noOfRoom').value = '0';
+            document.getElementById('noOfMember').value = '0';
+        }
+    }
+
+    document.querySelectorAll('input[name="categoryId"]').forEach(r => {
+        r.addEventListener('change', () => pickCategory(r.value === '1' ? 'res' : 'com'));
+        if (r.checked) pickCategory(r.value === '1' ? 'res' : 'com');
+    });
+
+    // ── AUTO AREA ──
+    function calcArea() {
+        const l = parseFloat(document.getElementById('fLength').value) || 0;
+        const w = parseFloat(document.getElementById('fWidth').value) || 0;
+        const area = l * w;
+        const res = document.getElementById('areaResult');
+        if (l > 0 && w > 0) {
+            document.getElementById('areaVal').textContent = area.toFixed(2);
+            document.getElementById('fArea').value = area.toFixed(2);
+            res.classList.add('show');
+        } else {
+            res.classList.remove('show');
+            document.getElementById('fArea').value = '';
+        }
+    }
+    document.getElementById('fLength').addEventListener('input', calcArea);
+    document.getElementById('fWidth').addEventListener('input', calcArea);
+
+    // ── VALIDATION ──
+    function setErr(fieldId, errId, show) {
+        const f = document.getElementById(fieldId), e = document.getElementById(errId);
+        if (f) f.classList.toggle('error', show);
+        if (e) e.classList.toggle('show', show);
+    }
+
+    function validateForm() {
+        let errors = [], valid = true;
+
+        const catOk = !!document.querySelector('input[name="categoryId"]:checked');
+        document.getElementById('e-category').classList.toggle('show', !catOk);
+        if (!catOk) { valid = false; errors.push('Category'); }
+
+        const ptOk = !!document.querySelector('input[name="propertyType"]:checked');
+        document.getElementById('e-propType').classList.toggle('show', !ptOk);
+        if (!ptOk) { valid = false; errors.push('Property Type'); }
+
+        const lt = document.getElementById('fListingType');
+        const ltOk = lt && lt.value !== '';
+        setErr('fListingType','e-listingType',!ltOk);
+        if (!ltOk) { valid = false; errors.push('Listing Type'); }
+
+        const city = document.getElementById('fCity');
+        const cityOk = city && city.value.trim() !== '';
+        setErr('fCity','e-city',!cityOk);
+        if (!cityOk) { valid = false; errors.push('City'); }
+
+        const price = document.getElementById('fPrice');
+        const priceOk = price && price.value.trim() !== '' && parseFloat(price.value) > 0;
+        setErr('fPrice','e-price',!priceOk);
+        if (!priceOk) { valid = false; errors.push('Price'); }
+
+        const banner = document.getElementById('valBanner');
+        const list   = document.getElementById('valList');
+        if (!valid) {
+            list.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+            banner.classList.add('show');
+            // FIX 2: pnameOk undefined tha, ab sahi logic hai
+            if (!catOk || !ptOk) openSec(1);
+            else if (!ltOk) openSec(2);
+            else if (!cityOk) openSec(3);
+            else if (!priceOk) openSec(4);
+            banner.scrollIntoView({behavior:'smooth', block:'start'});
+        } else {
+            banner.classList.remove('show');
+        }
+        return valid;
+    }
+
+    function openSec(n) {
+        const b = document.getElementById('b'+n), a = document.getElementById('a'+n);
+        if (b && b.classList.contains('col')) { b.classList.remove('col'); if(a) a.style.transform = 'rotate(180deg)'; }
+    }
+
+    // ── CONFETTI ──
+    function launchConfetti() {
+        const container = document.getElementById('confettiContainer');
+        container.innerHTML = '';
+        const colors = ['#1a6b72','#e8a44a','#38a169','#3182ce','#805ad5','#e53e3e','#dd6b20','#2a8a93'];
+        for (let i = 0; i < 60; i++) {
+            const piece = document.createElement('div');
+            piece.className = 'confetti-piece';
+            piece.style.cssText = `
+                left: ${Math.random() * 100}%;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                width: ${4 + Math.random() * 8}px;
+                height: ${4 + Math.random() * 8}px;
+                border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+                animation-duration: ${1.2 + Math.random() * 1.5}s;
+                animation-delay: ${Math.random() * 0.6}s;
+                opacity: 1;
+            `;
+            container.appendChild(piece);
+        }
+    }
+
+    // ── IMAGE PREVIEW + PRIMARY STAR ──
+    (function () {
+        const fileInput     = document.getElementById('fileInput');
+        const grid          = document.getElementById('imgPreviewGrid');
+        const thumbRow      = document.getElementById('imgThumbRow');
+        const noImgNote     = document.getElementById('noImgNote');
+        // FIX 1: submitBtn ID added on button, so this now works correctly
+        const submitBtn     = document.getElementById('submitBtn');
+        const primaryHidden = document.getElementById('primaryImageIndex');
+
+        let selectedFiles = [];
+        let primaryIdx    = 0;
+
+        fileInput.addEventListener('change', function () {
+            selectedFiles = Array.from(this.files).filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
+            primaryIdx = 0;
+            primaryHidden.value = 0;
+            renderPreviews();
+            toggleSubmit();
+        });
+
+        function renderPreviews() {
+            thumbRow.innerHTML = '';
+            if (!selectedFiles.length) {
+                grid.style.display = 'none';
+                noImgNote.style.display = 'flex';
+                return;
+            }
+            grid.style.display = 'block';
+            noImgNote.style.display = 'none';
+
+            selectedFiles.forEach(function (file, i) {
+                const wrap = document.createElement('div');
+                wrap.className = 'thumb-wrap';
+                wrap.style.border = '2px solid ' + (i === primaryIdx ? 'var(--accent)' : 'var(--border)');
+
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = 'Property image ' + (i + 1);
+                        wrap.insertBefore(img, wrap.firstChild);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    const ph = document.createElement('div');
+                    ph.style.cssText = 'width:100%;height:100%;background:var(--teal-light);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--teal);font-weight:600;';
+                    ph.textContent = 'VIDEO';
+                    wrap.appendChild(ph);
+                }
+
+                const star = document.createElement('button');
+                star.type = 'button';
+                star.className = 'thumb-star';
+                star.title = 'Set as primary image';
+                star.textContent = i === primaryIdx ? '★' : '☆';
+                star.style.color = i === primaryIdx ? '#f5c518' : '#fff';
+                star.addEventListener('click', function () {
+                    primaryIdx = i;
+                    primaryHidden.value = i;
+                    renderPreviews();
+                });
+                wrap.appendChild(star);
+
+                if (i === primaryIdx) {
+                    const badge = document.createElement('div');
+                    badge.className = 'thumb-primary-badge';
+                    badge.textContent = 'Primary';
+                    wrap.appendChild(badge);
+                }
+
+                thumbRow.appendChild(wrap);
+            });
+        }
+
+        function toggleSubmit() {
+            if (submitBtn) submitBtn.disabled = selectedFiles.length === 0;
+        }
+    })();
+
+    // ── SUBMIT ──
+    function handleSubmit() {
+        if (!validateForm()) return;
+        syncAmenities();
+
+        const ensureVal = (id, fb) => { const el=document.getElementById(id); if(el && !el.value.trim()) el.value=fb; };
+        ensureVal('fDesc', 'N/A');
+        document.querySelectorAll('input[name="location"]').forEach(el => { if(!el.value.trim()) el.value='N/A'; });
+        document.querySelectorAll('input[name="landmark"]').forEach(el => { if(!el.value.trim()) el.value='N/A'; });
+        const fi = document.querySelector('input[name="floor"]'); if(fi && !fi.value.trim()) fi.value='0';
+        const wi = document.getElementById('fWidth'); if(wi && !wi.value.trim()) wi.value='0';
+        const li = document.getElementById('fLength'); if(li && !li.value.trim()) li.value='0';
+
+        document.getElementById('successModal').classList.add('open');
+        launchConfetti();
+
+        setTimeout(() => {
+            const form = document.getElementById('propForm');
+            form.method = 'POST';  // ← YEH ADD KARO
+            form.submit();
+        }, 1800);
+    }
+
+    function closeModal() {
+        document.getElementById('successModal').classList.remove('open');
+        resetAll();
+        document.getElementById('propForm').reset();
+    }
+
+    // ── RESET ──
+    function resetAll() {
+        ['res-types','com-types'].forEach(id => document.getElementById(id).classList.remove('show'));
+        document.getElementById('cat-hint').style.display = 'flex';
+        document.getElementById('valBanner').classList.remove('show');
+        document.getElementById('areaResult').classList.remove('show');
+        document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+        document.querySelectorAll('.err-msg').forEach(el => el.classList.remove('show'));
+        document.getElementById('rp-no-cat').style.display = 'block';
+        document.getElementById('rp-common').classList.remove('show');
+        document.getElementById('rp-res-amen').classList.remove('show');
+        document.getElementById('rp-com-amen').classList.remove('show');
+        document.getElementById('imgPreviewGrid').style.display = 'none';
+        document.getElementById('imgThumbRow').innerHTML = '';
+        document.getElementById('noImgNote').style.display = 'flex';
+        document.getElementById('primaryImageIndex').value = '0';
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) submitBtn.disabled = true;
+        Object.values(furnMap).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('show');
+        });
+        applyAmenityRules('');
+        // FIX 3: currentPropType reset
+        currentPropType = '';
+    }
+
+    // ── SIDEBAR SYNC ──
+    [1,2,3,4,5].forEach(n => {
+        const el = document.getElementById('sec'+n);
+        if (!el) return;
+        new IntersectionObserver(e => { if(e[0].isIntersecting) syncStep(n); },{threshold:0.4}).observe(el);
+    });
+
+    // Clear errors on change
+    document.getElementById('fListingType').addEventListener('change',
+        () => setErr('fListingType','e-listingType',false));
+    document.getElementById('fCity').addEventListener('input',
+        () => setErr('fCity','e-city',false));
+    document.getElementById('fPrice').addEventListener('input',
+        () => setErr('fPrice','e-price',false));
+    document.querySelectorAll('input[name="categoryId"]').forEach(r =>
+    r.addEventListener('change', () => document.getElementById('e-category').classList.remove('show')));
+    document.querySelectorAll('input[name="propertyType"]').forEach(r =>
+    r.addEventListener('change', () => document.getElementById('e-propType').classList.remove('show')));
+</script>
+</body>
+</html>
