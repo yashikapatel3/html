@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mega Festivals of India</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Cookie&family=Dosis:wght@200..800&family=Lavishly+Yours&family=Limelight&family=Meow+Script&family=Monoton&family=Monsieur+La+Doulaise&family=Moo+Lah+Lah&family=Neonderthaw&family=Nosifer&family=Outfit&family=Pacifico&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ribeye&family=Rock+3D&family=WindSong:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        h2 {
+            font-family: pacifico, cursive;
+             color: #1d3865;
+             padding: 10px 0;
+             border-bottom: 2px solid #7ca7f3;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(90deg, #7c9cd5, #b0038b);
+        }
+
+        .navbar-brand {
+          font-family: Ribeye, cursive;
+            color: white !important;
+            font-weight: 500;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2rem;
+        }
+
+        .nav-link {
+            color: #ddd !important;
+            font-weight: 600;
+             transition: 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #ffcc00 !important;
+        }
+
+        /* Carousel */
+        .carousel-item img {
+            height: 80vh;
+            object-fit: cover;
+        }
+
+        .carousel-caption {
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        /* Cards */
+        .festival-card {
+            transition: 0.3s;
+            border-radius: 15px;
+        }
+
+        .festival-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .festival-card img {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        /* Image hover */
+        section img {
+            transition: 0.3s;
+        }
+
+        section img:hover {
+            transform: scale(1.05);
+        }
+
+        footer {
+            background: #141e30;
+            color: white;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <img src="C:\Users\nac\Downloads\India's vibrant festival celebration logo.png" alt="Logo" width="40" height="40" class="d-inline-block align-text-top me-2">
+        <a class="navbar-brand" href="#">Mega Festivals</a>
+        <button class="navbar-toggler bg-light" data-bs-toggle="collapse" data-bs-target="#nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="nav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Festivals</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Gallery</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- AUTO CAROUSEL -->
+<div id="festivalCarousel"
+     class="carousel slide carousel-fade"
+     data-bs-ride="carousel"
+     data-bs-interval="2500"
+     data-bs-pause="false"
+     data-bs-wrap="true">
+
+    <!-- Indicators -->
+    <div class="carousel-indicators">
+        <button data-bs-target="#festivalCarousel" data-bs-slide-to="0" class="active"></button>
+        <button data-bs-target="#festivalCarousel" data-bs-slide-to="1"></button>
+        <button data-bs-target="#festivalCarousel" data-bs-slide-to="2"></button>
+    </div>
+
+    <!-- Slides -->
+    <div class="carousel-inner">
+
+        <div class="carousel-item active">
+            <img src="C:\Users\nac\Downloads\pexels-himanshu-singh-148036179-32924881.jpg" class="d-block w-100">
+            <!-- <div class="carousel-caption">
+                <h2 class="text-warning">Diwali - Festival of Lights</h2>
+                <p>Celebrate happiness and positivity</p>
+            </div> -->
+        </div>
+
+        <div class="carousel-item">
+            <img src="C:\Users\nac\Downloads\download (6).jfif" class="d-block w-100">
+            <!-- <div class="carousel-caption">
+                <h2 class="text-warning">Holi - Festival of Colors</h2>
+                <p>Spread joy and vibrant colors</p>
+            </div> -->
+        </div>
+
+        <div class="carousel-item">
+            <img src="C:\Users\nac\Downloads\pexels-lara-jameson-8887050.jpg" class="d-block w-100">
+            <!-- <div class="carousel-caption">
+                <h2 class="text-warning">Durga Puja</h2>
+                <p>Grand celebration of devotion</p>
+            </div> -->
+        </div>
+
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev" data-bs-target="#festivalCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+
+    <button class="carousel-control-next" data-bs-target="#festivalCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+
+</div>
+
+<!-- Cards -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Popular Festivals</h2>
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <div class="card festival-card">
+                    <img src="C:\Users\nac\Downloads\Beautiful Diwali Rangoli with Diyas and Fireworks.jfif">
+                    <div class="card-body">
+                        <h5>Diwali</h5>
+                        <p>Festival of lights and joy.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card festival-card">
+                    <img src="C:\Users\nac\Downloads\pexels-rohit-gautam-1570927-12727865.jpg">
+                    <div class="card-body">
+                        <h5>Holi</h5>
+                        <p>Festival of colors and happiness.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card festival-card">
+                    <img src="C:\Users\nac\Downloads\pexels-avro-dutta-2153793012-34325584.jpg">
+                    <div class="card-body">
+                        <h5>Durga Puja</h5>
+                        <p>Celebration of Goddess Durga.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Details -->
+<section class="py-5 bg-light">
+    <div class="container">
+
+        <h2 class="text-center mb-5">Explore Indian Festivals</h2>
+
+        <div class="row mb-5 align-items-center">
+            <div class="col-md-6">
+                <img src="https://images.unsplash.com/photo-1607083206968-13611e3d76db" class="img-fluid rounded shadow">
+            </div>
+            <div class="col-md-6">
+                <h3>Diwali</h3>
+                <p>Festival of lights symbolizing victory of good over evil.</p>
+            </div>
+        </div>
+
+        <div class="row mb-5 align-items-center flex-md-row-reverse">
+            <div class="col-md-6">
+                <img src="https://images.unsplash.com/photo-1589998059171-988d887df646" class="img-fluid rounded shadow">
+            </div>
+            <div class="col-md-6">
+                <h3>Holi</h3>
+                <p>Festival of colors celebrating love and unity.</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="text-center">
+    <p>© 2026 Mega Festivals of India</p>
+</footer>
+
+<!-- Bootstrap JS (IMPORTANT) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
